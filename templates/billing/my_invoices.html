@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My Rent{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">My Rent</h2>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped bg-white align-middle">
+  <thead class="table-dark">
+    <tr><th>Month</th><th>Room / Bed</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Receipt</th></tr>
+  </thead>
+  <tbody>
+  {% for inv in invoices %}
+    <tr>
+      <td>{{ inv.month|date:"F Y" }}</td>
+      <td>{{ inv.description }}</td>
+      <td>₹{{ inv.amount }}</td>
+      <td>{{ inv.due_date|date:"d M Y" }}</td>
+      <td>
+        <span class="badge {% if inv.status == 'PAID' %}bg-success{% elif inv.status == 'OVERDUE' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+          {{ inv.get_status_display }}
+        </span>
+      </td>
+      <td>
+        {% if inv.status == 'PAID' %}
+          <a href="{% url 'receipt' inv.pk %}" class="btn btn-sm btn-outline-primary">PDF</a>
+        {% else %}
+          <span class="text-muted small">Warden ko pay karo</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="text-center text-muted">Abhi koi invoice nahi hai.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
