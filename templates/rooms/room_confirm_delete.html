@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Delete Room{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm col-md-6 mx-auto">
+  <div class="card-body">
+    <h4>Room {{ object.room_no }} delete karna hai?</h4>
+    <p class="text-muted">Iske saare beds bhi delete ho jayenge.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger">Haan, delete karo</button>
+      <a href="{% url 'room_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

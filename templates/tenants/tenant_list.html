@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Tenants{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Tenants</h2>
+  <div>
+    <a href="{% url 'allot_bed' %}" class="btn btn-success">Bed Allot Karo</a>
+    <a href="{% url 'tenant_add' %}" class="btn btn-primary">+ Register Tenant</a>
+  </div>
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped bg-white align-middle">
+  <thead class="table-dark">
+    <tr>
+      <th>Name</th><th>Username</th><th>Phone</th><th>Guardian</th>
+      <th>ID Proof</th><th>Current Bed</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for t in tenants %}
+    <tr>
+      <td>{{ t.user.get_full_name|default:t.user.username }}</td>
+      <td>{{ t.user.username }}</td>
+      <td>{{ t.user.phone }}</td>
+      <td>{{ t.guardian_name }} ({{ t.guardian_phone }})</td>
+      <td><a href="{{ t.id_proof.url }}" target="_blank">Dekho</a></td>
+      <td>
+        {% with a=t.current_allotment %}
+          {% if a %}
+            {{ a.bed.room.hostel.name }} / Room {{ a.bed.room.room_no }} / {{ a.bed.bed_no }}
+          {% else %}
+            <span class="text-muted">Allot nahi hua</span>
+          {% endif %}
+        {% endwith %}
+      </td>
+      <td>
+        {% with a=t.current_allotment %}
+          {% if a %}
+          <form method="post" action="{% url 'checkout' a.pk %}"
+                onsubmit="return confirm('Checkout karna hai?')">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-danger">Checkout</button>
+          </form>
+          {% endif %}
+        {% endwith %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="text-center text-muted">Abhi koi tenant nahi hai.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

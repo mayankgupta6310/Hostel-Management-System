@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Rooms{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Rooms</h2>
+  <a href="{% url 'room_add' %}" class="btn btn-primary">+ Add Room</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped bg-white align-middle">
+  <thead class="table-dark">
+    <tr>
+      <th>Hostel</th><th>Room</th><th>Floor</th><th>Rent/Bed</th>
+      <th>Beds</th><th>Occupied</th><th>Vacant</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for room in rooms %}
+    <tr>
+      <td>{{ room.hostel.name }}</td>
+      <td>{{ room.room_no }}</td>
+      <td>{{ room.floor }}</td>
+      <td>₹{{ room.rent_per_bed }}</td>
+      <td>
+        {% for bed in room.beds.all %}
+          <span class="badge {% if bed.is_occupied %}bg-danger{% else %}bg-success{% endif %}">{{ bed.bed_no }}</span>
+        {% endfor %}
+      </td>
+      <td>{{ room.occupied_count }}</td>
+      <td>{{ room.vacant_count }}</td>
+      <td>
+        <a href="{% url 'room_edit' room.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        {% if user.role == "ADMIN" %}
+        <a href="{% url 'room_delete' room.pk %}" class="btn btn-sm btn-danger">Delete</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="8" class="text-center text-muted">Abhi koi room nahi hai.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

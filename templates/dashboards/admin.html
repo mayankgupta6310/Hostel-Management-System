@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+<p class="text-muted">Welcome, {{ user.username }}. Yahan se aap hostel, rooms aur staff manage karoge.</p>
+<a href="{% url 'room_list' %}" class="btn btn-primary mt-3">Manage Rooms</a>
+<a href="{% url 'tenant_list' %}" class="btn btn-success mt-3">Manage Tenants</a>
+{% endblock %}
