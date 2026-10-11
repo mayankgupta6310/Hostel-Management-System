@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}My Gate Passes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>My Gate Passes</h2>
+  <a href="{% url 'pass_add' %}" class="btn btn-primary">+ Nayi Request</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped bg-white align-middle">
+  <thead class="table-dark">
+    <tr><th>#</th><th>Reason</th><th>Nikalna</th><th>Wapas (expected)</th><th>Status</th><th>Actual Return</th></tr>
+  </thead>
+  <tbody>
+  {% for p in passes %}
+    <tr>
+      <td>{{ p.pk }}</td>
+      <td>{{ p.reason }}</td>
+      <td>{{ p.out_time|date:"d M, h:i A" }}</td>
+      <td>{{ p.expected_return|date:"d M, h:i A" }}</td>
+      <td>
+        <span class="badge {{ p.badge_class }}">{{ p.get_status_display }}</span>
+        {% if p.is_late %}<span class="badge bg-danger">LATE</span>{% endif %}
+      </td>
+      <td>{{ p.actual_return|date:"d M, h:i A"|default:"-" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="text-center text-muted">Abhi koi gate pass nahi hai.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

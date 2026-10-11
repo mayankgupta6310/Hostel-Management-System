@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Guard Panel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Guard Panel</h2>
+  <div>
+    <a href="{% url 'visitor_list' %}" class="btn btn-outline-dark">Visitor Log</a>
+    <a href="{% url 'visitor_add' %}" class="btn btn-primary">+ Visitor Entry</a>
+  </div>
+</div>
+
+<h5 class="mt-4">Nikalne wale (Approved passes)</h5>
+<table class="table table-bordered bg-white align-middle">
+  <thead class="table-dark"><tr><th>Tenant</th><th>Reason</th><th>Wapas (expected)</th><th>Action</th></tr></thead>
+  <tbody>
+  {% for p in approved_passes %}
+    <tr>
+      <td>{{ p.tenant.user.get_full_name|default:p.tenant.user.username }}</td>
+      <td>{{ p.reason }}</td>
+      <td>{{ p.expected_return|date:"d M, h:i A" }}</td>
+      <td>
+        <form method="post" action="{% url 'pass_out' p.pk %}">
+          {% csrf_token %}<button class="btn btn-sm btn-primary">Bahar gaya</button>
+        </form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4" class="text-muted text-center">Koi approved pass nahi.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h5 class="mt-4">Abhi bahar hain</h5>
+<table class="table table-bordered bg-white align-middle">
+  <thead class="table-dark"><tr><th>Tenant</th><th>Nikla</th><th>Wapas (expected)</th><th>Status</th><th>Action</th></tr></thead>
+  <tbody>
+  {% for p in out_passes %}
+    <tr class="{% if p.is_late %}table-danger{% endif %}">
+      <td>{{ p.tenant.user.get_full_name|default:p.tenant.user.username }}</td>
+      <td>{{ p.actual_out|date:"d M, h:i A" }}</td>
+      <td>{{ p.expected_return|date:"d M, h:i A" }}</td>
+      <td>{% if p.is_late %}<span class="badge bg-danger">LATE</span>{% else %}<span class="badge bg-primary">Bahar hai</span>{% endif %}</td>
+      <td>
+        <form method="post" action="{% url 'pass_return' p.pk %}">
+          {% csrf_token %}<button class="btn btn-sm btn-success">Wapas aaya</button>
+        </form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5" class="text-muted text-center">Abhi koi bahar nahi hai.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h5 class="mt-4">Abhi andar visitors</h5>
+<table class="table table-bordered bg-white align-middle">
+  <thead class="table-dark"><tr><th>Visitor</th><th>Phone</th><th>Kisse milne</th><th>Entry</th><th>Action</th></tr></thead>
+  <tbody>
+  {% for v in inside_visitors %}
+    <tr>
+      <td>{{ v.visitor_name }}</td>
+      <td>{{ v.phone|default:"-" }}</td>
+      <td>{{ v.tenant.user.get_full_name|default:v.tenant.user.username }}</td>
+      <td>{{ v.in_time|date:"d M, h:i A" }}</td>
+      <td>
+        <form method="post" action="{% url 'visitor_out' v.pk %}">
+          {% csrf_token %}<button class="btn btn-sm btn-warning">Exit</button>
+        </form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5" class="text-muted text-center">Koi visitor andar nahi hai.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
