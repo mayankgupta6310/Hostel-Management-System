@@ -4,4 +4,5 @@
 {% block content %}
 <h2>Maintenance Staff Dashboard</h2>
 <p class="text-muted">Welcome, {{ user.username }}. Yahan se aap hostel, rooms aur staff manage karoge.</p>
+<a href="{% url 'staff_tasks' %}" class="btn btn-primary mt-3">Mere Tasks</a>
 {% endblock %}

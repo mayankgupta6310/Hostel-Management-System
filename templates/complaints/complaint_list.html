@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Complaints{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Complaints</h2>
+
+<div class="mb-3">
+  <a href="{% url 'complaint_list' %}" class="btn btn-sm {% if not current_status %}btn-dark{% else %}btn-outline-dark{% endif %}">All</a>
+  {% for value, label in statuses %}
+    <a href="?status={{ value }}" class="btn btn-sm {% if current_status == value %}btn-dark{% else %}btn-outline-dark{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped bg-white align-middle">
+  <thead class="table-dark">
+    <tr><th>#</th><th>Tenant</th><th>Category</th><th>Title</th><th>Photo</th><th>Status</th><th>Assign / Assigned To</th></tr>
+  </thead>
+  <tbody>
+  {% for c in complaints %}
+    <tr>
+      <td>{{ c.pk }}</td>
+      <td>{{ c.tenant.user.get_full_name|default:c.tenant.user.username }}</td>
+      <td>{{ c.get_category_display }}</td>
+      <td>{{ c.title }}<div class="small text-muted">{{ c.description|truncatechars:60 }}</div></td>
+      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">Dekho</a>{% else %}-{% endif %}</td>
+      <td><span class="badge {{ c.badge_class }}">{{ c.get_status_display }}</span></td>
+      <td>
+        {% if c.status != 'RESOLVED' %}
+        <form method="post" action="{% url 'complaint_assign' c.pk %}" class="d-flex gap-1">
+          {% csrf_token %}
+          <select name="staff_id" class="form-select form-select-sm" required>
+            <option value="">Staff chuno</option>
+            {% for s in staff_users %}
+              <option value="{{ s.pk }}" {% if c.assigned_to_id == s.pk %}selected{% endif %}>{{ s.username }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-sm btn-primary">Assign</button>
+        </form>
+        {% else %}
+          {{ c.assigned_to.username|default:"-" }}
+          <div class="small text-muted">{{ c.staff_remark }}</div>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="text-center text-muted">Koi complaint nahi mili.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
