@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Mess Menu{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Weekly Mess Menu</h2>
+  <div>
+    {% if user.role == "TENANT" %}
+      <a href="{% url 'my_meals' %}" class="btn btn-success">Meal ON / OFF</a>
+      <a href="{% url 'feedback_add' %}" class="btn btn-outline-primary">Feedback do</a>
+    {% endif %}
+    {% if user.role == "MESS" or user.role == "ADMIN" %}
+      <a href="{% url 'menu_edit' %}" class="btn btn-primary">Menu set karo</a>
+      <a href="{% url 'meal_count' %}" class="btn btn-success">Meal Count</a>
+      <a href="{% url 'feedback_list' %}" class="btn btn-outline-dark">Feedback</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered bg-white align-middle">
+  <thead class="table-dark"><tr><th>Din</th><th>Breakfast</th><th>Lunch</th><th>Dinner</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr class="{% if r.is_today %}table-warning{% endif %}">
+      <td><strong>{{ r.day }}</strong>{% if r.is_today %} <span class="badge bg-dark">Aaj</span>{% endif %}</td>
+      <td>{{ r.breakfast }}</td>
+      <td>{{ r.lunch }}</td>
+      <td>{{ r.dinner }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

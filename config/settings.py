@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'billing',
     'complaints',
     'gatekeeping',
+    'mess',
+    'notices',
+    'reports',
 ]
 
 MIDDLEWARE = [

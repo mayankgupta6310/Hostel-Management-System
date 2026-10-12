@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Notices{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Notice Board</h2>
+  {% if user.role == "ADMIN" or user.role == "WARDEN" %}
+    <a href="{% url 'notice_add' %}" class="btn btn-primary">+ Naya Notice</a>
+  {% endif %}
+</div>
+
+{% for n in notices %}
+<div class="card shadow-sm mb-3 {% if n.is_important %}border-danger{% endif %}">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <h5 class="card-title">
+        {% if n.is_important %}<span class="badge bg-danger">Important</span>{% endif %}
+        {{ n.title }}
+      </h5>
+      {% if user.role == "ADMIN" or user.role == "WARDEN" %}
+      <form method="post" action="{% url 'notice_delete' n.pk %}" onsubmit="return confirm('Delete karna hai?')">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-outline-danger">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+    <p class="card-text" style="white-space: pre-line;">{{ n.body }}</p>
+    <div class="small text-muted">{{ n.created_by.username|default:"-" }} | {{ n.created_at|date:"d M Y, h:i A" }}</div>
+  </div>
+</div>
+{% empty %}
+  <div class="alert alert-info">Abhi koi notice nahi hai.</div>
+{% endfor %}
+{% endblock %}

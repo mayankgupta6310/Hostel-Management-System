@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Meal ON / OFF{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Meal ON / OFF</h2>
+  <a href="{% url 'mess_menu' %}" class="btn btn-outline-dark">Menu dekho</a>
+</div>
+
+{% if not has_profile %}
+  <div class="alert alert-warning">Aapki tenant profile nahi bani hai. Warden se register karwao.</div>
+{% else %}
+<p class="text-muted">Default mein saare meals ON hote hain. Jo meal nahi khana, use OFF karo. Aaj ka meal change nahi ho sakta, kal se agle 3 din tak badal sakte ho.</p>
+
+<div class="row">
+{% for day in days %}
+  <div class="col-md-6 col-lg-3 mb-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-bold">{{ day.date|date:"D, d M" }}</div>
+      <ul class="list-group list-group-flush">
+        {% for m in day.meals %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ m.label }}</span>
+          {% if day.editable %}
+          <form method="post" action="{% url 'toggle_meal' %}">
+            {% csrf_token %}
+            <input type="hidden" name="date" value="{{ day.date|date:'Y-m-d' }}">
+            <input type="hidden" name="meal" value="{{ m.code }}">
+            <button class="btn btn-sm {% if m.on %}btn-success{% else %}btn-outline-secondary{% endif %}">
+              {% if m.on %}ON{% else %}OFF{% endif %}
+            </button>
+          </form>
+          {% else %}
+            <span class="badge {% if m.on %}bg-success{% else %}bg-secondary{% endif %}">{% if m.on %}ON{% else %}OFF{% endif %}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

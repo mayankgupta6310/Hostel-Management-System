@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Reports Dashboard</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
+    <div class="text-muted">Occupancy</div>
+    <div class="fs-2 fw-bold">{{ occupancy_pct }}%</div>
+    <div class="small">{{ occupied }} / {{ total_beds }} beds bhare</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
+    <div class="text-muted">Active Tenants</div>
+    <div class="fs-2 fw-bold">{{ total_tenants }}</div>
+    <div class="small">{{ vacant }} beds khali</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
+    <div class="text-muted">Rent Collected</div>
+    <div class="fs-2 fw-bold text-success">₹{{ rent_paid }}</div>
+    <div class="small">Pending: ₹{{ rent_pending }}</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
+    <div class="text-muted">Overdue</div>
+    <div class="fs-2 fw-bold text-danger">₹{{ rent_overdue }}</div>
+    <div class="small">{{ open_complaints }} complaints khuli</div>
+  </div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card shadow-sm"><div class="card-body">
+    <h6>Bed Occupancy</h6>
+    <canvas id="occChart"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card shadow-sm"><div class="card-body">
+    <h6>Monthly Rent Collection</h6>
+    <canvas id="rentChart"></canvas>
+  </div></div></div>
+  <div class="col-md-4"><div class="card shadow-sm"><div class="card-body">
+    <h6>Complaints by Status</h6>
+    <canvas id="compChart"></canvas>
+  </div></div></div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h6>Defaulters (Overdue Rent)</h6>
+    <table class="table table-sm align-middle mb-0">
+      <thead><tr><th>Tenant</th><th>Month</th><th>Amount</th><th>Due Date</th></tr></thead>
+      <tbody>
+      {% for inv in defaulters %}
+        <tr>
+          <td>{{ inv.tenant.user.get_full_name|default:inv.tenant.user.username }}</td>
+          <td>{{ inv.month|date:"M Y" }}</td>
+          <td>₹{{ inv.amount }}</td>
+          <td>{{ inv.due_date|date:"d M Y" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center text-muted">Koi defaulter nahi.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+{{ month_labels|json_script:"month-labels" }}
+{{ month_values|json_script:"month-values" }}
+{{ complaint_labels|json_script:"comp-labels" }}
+{{ complaint_values|json_script:"comp-values" }}
+<script>
+  const get = id => JSON.parse(document.getElementById(id).textContent);
+
+  new Chart(document.getElementById('occChart'), {
+    type: 'doughnut',
+    data: { labels: ['Occupied', 'Vacant'],
+            datasets: [{ data: [{{ occupied }}, {{ vacant }}], backgroundColor: ['#dc3545', '#198754'] }] }
+  });
+
+  new Chart(document.getElementById('rentChart'), {
+    type: 'bar',
+    data: { labels: get('month-labels'),
+            datasets: [{ label: 'Collected (₹)', data: get('month-values'), backgroundColor: '#0d6efd' }] },
+    options: { scales: { y: { beginAtZero: true } } }
+  });
+
+  new Chart(document.getElementById('compChart'), {
+    type: 'pie',
+    data: { labels: get('comp-labels'),
+            datasets: [{ data: get('comp-values'),
+                         backgroundColor: ['#dc3545', '#0dcaf0', '#ffc107', '#198754'] }] }
+  });
+</script>
+{% endblock %}
