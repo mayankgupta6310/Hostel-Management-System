@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Deposit{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">My Security Deposit</h2>
+
+{% if deposit %}
+<div class="card shadow-sm col-md-6">
+  <div class="card-body">
+    <p class="mb-1"><strong>Deposit:</strong> ₹{{ deposit.amount }}</p>
+    <p class="mb-1"><strong>Date:</strong> {{ deposit.collected_on|date:"d M Y" }}</p>
+    <p class="mb-1"><strong>Status:</strong>
+      <span class="badge {% if deposit.status == 'HELD' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ deposit.get_status_display }}</span>
+    </p>
+    {% if deposit.status == 'REFUNDED' %}
+      <hr>
+      <p class="mb-1"><strong>Deduction:</strong> ₹{{ deposit.deduction }} {% if deposit.deduction_reason %}({{ deposit.deduction_reason }}){% endif %}</p>
+      <p class="mb-1"><strong>Refund mila:</strong> ₹{{ deposit.refunded_amount }}</p>
+      <p class="mb-0 text-muted small">{{ deposit.refunded_on|date:"d M Y" }}</p>
+    {% else %}
+      <p class="text-muted small mb-0 mt-2">Checkout ke baad damage kaat ke refund hoga.</p>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+  <div class="alert alert-info">Aapka deposit abhi record nahi hua hai.</div>
+{% endif %}
+{% endblock %}

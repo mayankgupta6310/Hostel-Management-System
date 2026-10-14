@@ -9,15 +9,20 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView, UpdateView, TemplateView
+from .forms import DepositForm, RefundForm
+from django.urls import reverse_lazy
+from .models import RentInvoice, Payment, SecurityDeposit
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
 from accounts.mixins import RoleRequiredMixin
-from .models import RentInvoice, Payment
+from .models import RentInvoice, Payment, SecurityDeposit
 from .services import generate_monthly_invoices, mark_overdue
 
 from accounts.emails import notify_user
+
+
 
 
 class StaffMixin(RoleRequiredMixin):
@@ -146,3 +151,84 @@ class ReceiptView(LoginRequiredMixin, View):
         buf.seek(0)
 
         return FileResponse(buf, as_attachment=True, filename=f"receipt_{invoice.pk}.pdf")
+
+# ---------- Security Deposit ----------
+class DepositListView(StaffMixin, ListView):
+    template_name = "billing/deposit_list.html"
+    context_object_name = "deposits"
+
+    def get_queryset(self):
+        return SecurityDeposit.objects.select_related("tenant__user", "handled_by")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        held = SecurityDeposit.objects.filter(status=SecurityDeposit.Status.HELD)
+        ctx["total_held"] = held.aggregate(s=Sum("amount"))["s"] or 0
+        return ctx
+
+
+class DepositCreateView(StaffMixin, CreateView):
+    form_class = DepositForm
+    template_name = "billing/deposit_form.html"
+    success_url = reverse_lazy("deposit_list")
+
+    def form_valid(self, form):
+        form.instance.handled_by = self.request.user
+        messages.success(self.request, "Deposit record ho gaya.")
+        return super().form_valid(form)
+
+
+class RefundView(StaffMixin, UpdateView):
+    form_class = RefundForm
+    template_name = "billing/refund_form.html"
+    success_url = reverse_lazy("deposit_list")
+
+    def get_queryset(self):
+        # sirf HELD deposit, aur sirf checkout ho chuke tenant ka
+        return SecurityDeposit.objects.filter(
+            status=SecurityDeposit.Status.HELD
+        ).exclude(tenant__allotments__is_active=True).select_related("tenant__user")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        dues = RentInvoice.objects.filter(tenant=self.object.tenant).exclude(
+            status=RentInvoice.Status.PAID
+        ).aggregate(s=Sum("amount"))["s"] or 0
+        ctx["dues"] = dues
+        return ctx
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            dep = SecurityDeposit.objects.select_for_update().get(pk=self.object.pk)
+            if dep.status != SecurityDeposit.Status.HELD:
+                messages.warning(self.request, "Yeh deposit pehle hi refund ho chuka hai.")
+                return redirect("deposit_list")
+
+            dep.deduction = form.cleaned_data["deduction"]
+            dep.deduction_reason = form.cleaned_data["deduction_reason"]
+            dep.refunded_amount = dep.amount - dep.deduction
+            dep.refunded_on = timezone.localdate()
+            dep.status = SecurityDeposit.Status.REFUNDED
+            dep.handled_by = self.request.user
+            dep.save()
+
+        notify_user(
+            dep.tenant.user,
+            "Security deposit refund",
+            f"Aapka security deposit refund process ho gaya.\n"
+            f"Deposit: Rs. {dep.amount}\n"
+            f"Deduction: Rs. {dep.deduction} ({dep.deduction_reason or '-'})\n"
+            f"Refund: Rs. {dep.refunded_amount}\n\nHostel Management",
+        )
+        messages.success(self.request, f"Rs. {dep.refunded_amount} refund mark ho gaya.")
+        return redirect("deposit_list")
+
+
+class MyDepositView(RoleRequiredMixin, TemplateView):
+    allowed_roles = ["TENANT"]
+    template_name = "billing/my_deposit.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["deposit"] = SecurityDeposit.objects.filter(tenant__user=self.request.user).first()
+        return ctx

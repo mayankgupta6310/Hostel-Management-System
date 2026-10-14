@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Hostel Management{% endblock %}
+
+{% block content %}
+<div class="text-center my-4">
+  <h1 class="hero-title">Hostel Management System</h1>
+  <p class="fs-5">Apna role chuno aur login karo</p>
+</div>
+
+<div class="row g-4 justify-content-center scene">
+  {% for code, title, desc, color in roles %}
+  <div class="col-md-4 col-sm-6">
+    <a href="{% url 'login' %}?role={{ code }}" class="role-card c-{{ color }} text-decoration-none">
+      <div class="icon">
+        {% if code == "ADMIN" %}👑{% elif code == "WARDEN" %}🛡️{% elif code == "TENANT" %}🎓{% elif code == "MESS" %}🍛{% elif code == "GUARD" %}💂{% else %}🔧{% endif %}
+      </div>
+      <h4>{{ title }}</h4>
+      <p>{{ desc }}</p>
+      <span class="go">Login →</span>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

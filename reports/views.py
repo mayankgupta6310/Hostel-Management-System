@@ -8,6 +8,14 @@ from complaints.models import Complaint
 from rooms.models import Bed
 from tenants.models import Tenant
 
+from datetime import timedelta
+
+from django.utils import timezone
+from django.views import View
+
+from mess.models import MealOptOut, MealType
+from .excel import make_xlsx_response
+
 
 class DashboardReportView(RoleRequiredMixin, TemplateView):
     allowed_roles = ["ADMIN", "WARDEN"]
@@ -56,3 +64,81 @@ class DashboardReportView(RoleRequiredMixin, TemplateView):
             .select_related("tenant__user").order_by("due_date")[:10]
         )
         return ctx
+
+def _safe(text):
+    """Excel formula injection se bachav: = + - @ se shuru hone wala text."""
+    text = "" if text is None else str(text)
+    return "'" + text if text[:1] in ("=", "+", "-", "@") else text
+
+
+class DuesExportView(RoleRequiredMixin, View):
+    allowed_roles = ["ADMIN", "WARDEN"]
+
+    def get(self, request):
+        invoices = (
+            RentInvoice.objects.exclude(status="PAID")
+            .select_related("tenant__user").order_by("due_date")
+        )
+        rows = [
+            [
+                _safe(i.tenant.user.get_full_name() or i.tenant.user.username),
+                i.month.strftime("%b %Y"),
+                _safe(i.description),
+                float(i.amount),
+                i.due_date.strftime("%d %b %Y"),
+                i.get_status_display(),
+            ]
+            for i in invoices
+        ]
+        return make_xlsx_response(
+            "dues_report.xlsx", "Dues",
+            ["Tenant", "Month", "Room / Bed", "Amount (Rs)", "Due Date", "Status"], rows,
+        )
+
+
+class TenantsExportView(RoleRequiredMixin, View):
+    allowed_roles = ["ADMIN", "WARDEN"]
+
+    def get(self, request):
+        tenants = Tenant.objects.select_related("user").prefetch_related(
+            "allotments__bed__room__hostel"
+        )
+        rows = []
+        for t in tenants:
+            a = t.current_allotment
+            bed = f"{a.bed.room.hostel.name} / Room {a.bed.room.room_no} / {a.bed.bed_no}" if a else "Allot nahi hua"
+            rows.append([
+                _safe(t.user.get_full_name() or t.user.username),
+                _safe(t.user.username),
+                _safe(t.user.phone),
+                _safe(t.guardian_name),
+                _safe(t.guardian_phone),
+                bed,
+                t.joined_on.strftime("%d %b %Y"),
+            ])
+        return make_xlsx_response(
+            "tenants.xlsx", "Tenants",
+            ["Name", "Username", "Phone", "Guardian", "Guardian Phone", "Current Bed", "Joined"], rows,
+        )
+
+
+class MealCountExportView(RoleRequiredMixin, View):
+    allowed_roles = ["ADMIN", "WARDEN", "MESS"]
+
+    def get(self, request):
+        today = timezone.localdate()
+        total = Tenant.objects.filter(allotments__is_active=True).distinct().count()
+        rows = []
+        for offset in range(3):
+            d = today + timedelta(days=offset)
+            for code, label in MealType.choices:
+                off = (
+                    MealOptOut.objects.filter(
+                        date=d, meal_type=code, tenant__allotments__is_active=True
+                    ).values("tenant").distinct().count()
+                )
+                rows.append([d.strftime("%d %b %Y"), label, total, off, total - off])
+        return make_xlsx_response(
+            "meal_count.xlsx", "Meal Count",
+            ["Date", "Meal", "Total Tenants", "OFF", "Count"], rows,
+        )

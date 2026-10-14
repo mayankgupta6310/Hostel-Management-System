@@ -41,3 +41,27 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.invoice} - Rs.{self.amount}"
+
+class SecurityDeposit(models.Model):
+    class Status(models.TextChoices):
+        HELD = "HELD", "Held"
+        REFUNDED = "REFUNDED", "Refunded"
+
+    tenant = models.OneToOneField("tenants.Tenant", on_delete=models.CASCADE, related_name="deposit")
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    collected_on = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.HELD)
+    deduction = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    deduction_reason = models.CharField(max_length=250, blank=True)
+    refunded_amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    refunded_on = models.DateField(null=True, blank=True)
+    handled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="+",
+    )
+
+    class Meta:
+        ordering = ["-collected_on"]
+
+    def __str__(self):
+        return f"Deposit {self.tenant} - Rs.{self.amount}"
