@@ -1,6 +1,12 @@
+import uuid
+from io import BytesIO
+
+import qrcode
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import View
@@ -168,3 +174,67 @@ class VisitorOutView(GuardMixin, View):
             v.save()
         messages.success(request, f"{v.visitor_name} ka exit mark ho gaya.")
         return redirect("guard_panel")
+
+    
+class PassQRView(RoleRequiredMixin, View):
+    """Approved pass ka QR image. Sirf pass ka malik tenant ya staff dekh sakta hai."""
+    allowed_roles = ["TENANT", "ADMIN", "WARDEN"]
+
+    def get(self, request, pk):
+        gp = get_object_or_404(GatePass, pk=pk)
+        if request.user.role == "TENANT" and gp.tenant.user_id != request.user.id:
+            raise PermissionDenied
+        if gp.status in (GatePass.Status.PENDING, GatePass.Status.REJECTED):
+            raise PermissionDenied
+
+        img = qrcode.make(str(gp.token))
+        buf = BytesIO()
+        img.save(buf, format="PNG")
+        return HttpResponse(buf.getvalue(), content_type="image/png")
+
+
+class ScanView(GuardMixin, View):
+    """Token se pass dhundho: APPROVED -> OUT, OUT -> RETURNED."""
+
+    def get(self, request):
+        return render(request, "gatekeeping/scan.html")
+
+    def post(self, request):
+        raw = (request.POST.get("token") or "").strip()
+        try:
+            token = uuid.UUID(raw)
+        except ValueError:
+            messages.error(request, "Galat QR / token.")
+            return redirect("scan")
+
+        with transaction.atomic():
+            gp = (
+                GatePass.objects.select_for_update()
+                .select_related("tenant__user")
+                .filter(token=token)
+                .first()
+            )
+            if gp is None:
+                messages.error(request, "Yeh pass nahi mila.")
+                return redirect("scan")
+
+            name = gp.tenant.user.get_full_name() or gp.tenant.user.username
+
+            if gp.status == GatePass.Status.APPROVED:
+                gp.status = GatePass.Status.OUT
+                gp.actual_out = timezone.now()
+                gp.save()
+                messages.success(request, f"{name} BAHAR gaya.")
+            elif gp.status == GatePass.Status.OUT:
+                gp.status = GatePass.Status.RETURNED
+                gp.actual_return = timezone.now()
+                gp.save()
+                if gp.is_late:
+                    messages.warning(request, f"{name} LATE wapas aaya.")
+                else:
+                    messages.success(request, f"{name} time par WAPAS aaya.")
+            elif gp.status == GatePass.Status.RETURNED:
+                messages.warning(request, "Yeh pass pehle hi use ho chuka hai.")
+            else:
+                messages.error(request, f"Pass {gp.get_status_display()} hai, scan nahi ho sakta.")
+        return redirect("scan")

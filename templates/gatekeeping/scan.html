@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Scan Pass{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>QR Scan</h2>
+  <a href="{% url 'guard_panel' %}" class="btn btn-outline-dark">Guard Panel</a>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <div class="card shadow-sm"><div class="card-body">
+      <h6>Camera se scan</h6>
+      <div id="reader" style="width:100%"></div>
+    </div></div>
+  </div>
+  <div class="col-md-6 mb-3">
+    <div class="card shadow-sm"><div class="card-body">
+      <h6>Ya token manually daalo</h6>
+      <form method="post" id="scanForm">
+        {% csrf_token %}
+        <input type="text" name="token" id="tokenInput" class="form-control mb-2" placeholder="Token paste karo" autofocus>
+        <button class="btn btn-primary">Submit</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  let done = false;
+  const scanner = new Html5Qrcode("reader");
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 220 },
+    (text) => {
+      if (done) return;
+      done = true;
+      document.getElementById('tokenInput').value = text;
+      scanner.stop().finally(() => document.getElementById('scanForm').submit());
+    }
+  ).catch(() => {
+    document.getElementById('reader').innerHTML =
+      '<div class="text-muted">Camera nahi chala. Token manually daalo.</div>';
+  });
+</script>
+{% endblock %}

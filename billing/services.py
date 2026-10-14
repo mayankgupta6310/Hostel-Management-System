@@ -1,5 +1,6 @@
 from django.utils import timezone
 
+from accounts.emails import notify_user
 from tenants.models import Allotment
 from .models import RentInvoice
 
@@ -18,11 +19,11 @@ def generate_monthly_invoices(today=None):
     due = month.replace(day=10)
 
     allotments = Allotment.objects.filter(is_active=True).select_related(
-        "tenant", "bed__room"
+        "tenant__user", "bed__room"
     )
     created = 0
     for a in allotments:
-        _, was_created = RentInvoice.objects.get_or_create(
+        invoice, was_created = RentInvoice.objects.get_or_create(
             tenant=a.tenant,
             month=month,
             defaults={
@@ -31,7 +32,17 @@ def generate_monthly_invoices(today=None):
                 "description": f"Room {a.bed.room.room_no} / {a.bed.bed_no}",
             },
         )
-        created += int(was_created)
+        if was_created:
+            created += 1
+            notify_user(
+                a.tenant.user,
+                f"Rent invoice - {month:%B %Y}",
+                f"Namaste {a.tenant.user.get_full_name() or a.tenant.user.username},\n\n"
+                f"{month:%B %Y} ka rent invoice ban gaya hai.\n"
+                f"Amount: Rs. {invoice.amount}\n"
+                f"Last date: {invoice.due_date:%d %b %Y}\n\n"
+                f"Hostel Management",
+            )
 
     mark_overdue(today)
     return created

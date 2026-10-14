@@ -10,7 +10,7 @@
 <div class="table-responsive">
 <table class="table table-bordered table-striped bg-white align-middle">
   <thead class="table-dark">
-    <tr><th>#</th><th>Reason</th><th>Nikalna</th><th>Wapas (expected)</th><th>Status</th><th>Actual Return</th></tr>
+    <tr><th>#</th><th>Reason</th><th>Nikalna</th><th>Wapas (expected)</th><th>Status</th><th>Actual Return</th><th>QR</th></tr>
   </thead>
   <tbody>
   {% for p in passes %}
@@ -24,9 +24,16 @@
         {% if p.is_late %}<span class="badge bg-danger">LATE</span>{% endif %}
       </td>
       <td>{{ p.actual_return|date:"d M, h:i A"|default:"-" }}</td>
+      <td>
+        {% if p.status == 'APPROVED' or p.status == 'OUT' %}
+          <a href="{% url 'pass_qr' p.pk %}" target="_blank">
+            <img src="{% url 'pass_qr' p.pk %}" width="90" alt="QR">
+          </a>
+        {% else %}-{% endif %}
+      </td>
     </tr>
   {% empty %}
-    <tr><td colspan="6" class="text-center text-muted">Abhi koi gate pass nahi hai.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">Abhi koi gate pass nahi hai.</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -17,6 +17,8 @@ from accounts.mixins import RoleRequiredMixin
 from .models import RentInvoice, Payment
 from .services import generate_monthly_invoices, mark_overdue
 
+from accounts.emails import notify_user
+
 
 class StaffMixin(RoleRequiredMixin):
     allowed_roles = ["ADMIN", "WARDEN"]
@@ -81,6 +83,14 @@ class MarkPaidView(StaffMixin, View):
             )
             invoice.status = RentInvoice.Status.PAID
             invoice.save(update_fields=["status"])
+
+        notify_user(
+            invoice.tenant.user,
+            f"Payment received - {invoice.month:%B %Y}",
+            f"Rs. {invoice.amount} ka payment mil gaya ({method}).\n"
+            f"Month: {invoice.month:%B %Y}\n"
+            f"Receipt portal se download karo: My Rent.\n\nHostel Management",
+        )
 
         messages.success(request, f"{invoice} paid mark ho gaya.")
         return redirect("invoice_list")

@@ -15,6 +15,7 @@ class TenantRegisterForm(BootstrapMixin, forms.ModelForm):
     first_name = forms.CharField(max_length=150)
     last_name = forms.CharField(max_length=150, required=False)
     phone = forms.CharField(max_length=15)
+    email = forms.EmailField(required=False)
     password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
@@ -22,7 +23,7 @@ class TenantRegisterForm(BootstrapMixin, forms.ModelForm):
         fields = ["guardian_name", "guardian_phone", "id_proof"]
 
     field_order = [
-        "username", "password", "first_name", "last_name", "phone",
+        "username", "password", "first_name", "last_name", "phone","email",
         "guardian_name", "guardian_phone", "id_proof",
     ]
 
@@ -46,6 +47,7 @@ class TenantRegisterForm(BootstrapMixin, forms.ModelForm):
                 first_name=d["first_name"],
                 last_name=d["last_name"],
                 phone=d["phone"],
+                email=d.get("email", ""),
                 role="TENANT",
             )
             tenant = super().save(commit=False)

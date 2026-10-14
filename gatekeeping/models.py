@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+import uuid
 
 class GatePass(models.Model):
     class Status(models.TextChoices):
@@ -15,6 +16,7 @@ class GatePass(models.Model):
     reason = models.CharField(max_length=200)
     out_time = models.DateTimeField(help_text="Kab nikalna hai")
     expected_return = models.DateTimeField(help_text="Kab tak wapas aaoge")
+    token = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,

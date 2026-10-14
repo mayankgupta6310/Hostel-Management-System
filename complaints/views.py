@@ -10,6 +10,8 @@ from accounts.mixins import RoleRequiredMixin
 from .forms import ComplaintForm
 from .models import Complaint
 
+from accounts.emails import notify_user
+
 User = get_user_model()
 
 
@@ -111,5 +113,12 @@ class UpdateStatusView(RoleRequiredMixin, View):
         complaint.staff_remark = request.POST.get("remark", "")[:255]
         complaint.resolved_at = timezone.now() if new_status == Complaint.Status.RESOLVED else None
         complaint.save()
+        if new_status == Complaint.Status.RESOLVED:
+            notify_user(
+                complaint.tenant.user,
+                f"Complaint #{complaint.pk} resolve ho gayi",
+                f"Aapki complaint \"{complaint.title}\" resolve ho gayi hai.\n"
+                f"Staff remark: {complaint.staff_remark or '-'}\n\nHostel Management",
+            )
         messages.success(request, f"{complaint} update ho gayi.")
         return redirect("staff_tasks")

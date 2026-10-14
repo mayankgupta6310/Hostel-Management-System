@@ -12,4 +12,6 @@ urlpatterns = [
     path("visitors/", views.VisitorListView.as_view(), name="visitor_list"),
     path("visitors/new/", views.VisitorCreateView.as_view(), name="visitor_add"),
     path("visitors/<int:pk>/out/", views.VisitorOutView.as_view(), name="visitor_out"),
+    path("<int:pk>/qr/", views.PassQRView.as_view(), name="pass_qr"),
+    path("scan/", views.ScanView.as_view(), name="scan"),
 ]

@@ -138,3 +138,7 @@ LOGOUT_REDIRECT_URL = "login"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Development: email terminal mein print hoti hai
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "Hostel Management <noreply@hostel.local>"
