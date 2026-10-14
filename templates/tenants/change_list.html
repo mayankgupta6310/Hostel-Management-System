@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Room Change Requests{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Room Change Requests</h2>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped bg-white align-middle">
+  <thead class="table-dark">
+    <tr><th>#</th><th>Tenant</th><th>Abhi ka</th><th>Chahiye</th><th>Reason</th><th>Status</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+  {% for r in requests %}
+    <tr>
+      <td>{{ r.pk }}</td>
+      <td>{{ r.tenant.user.get_full_name|default:r.tenant.user.username }}</td>
+      <td>Room {{ r.current_bed.room.room_no }} / {{ r.current_bed.bed_no }}
+          <div class="small text-muted">Rs. {{ r.current_bed.room.rent_per_bed }}</div></td>
+      <td>Room {{ r.requested_bed.room.room_no }} / {{ r.requested_bed.bed_no }}
+          <div class="small text-muted">Rs. {{ r.requested_bed.room.rent_per_bed }}</div></td>
+      <td>{{ r.reason }}</td>
+      <td><span class="badge {{ r.badge_class }}">{{ r.get_status_display }}</span></td>
+      <td>
+        {% if r.status == 'PENDING' %}
+        <form method="post" action="{% url 'change_decide' r.pk %}" class="d-flex flex-column gap-1">
+          {% csrf_token %}
+          <input type="text" name="remark" class="form-control form-control-sm" placeholder="Remark (optional)">
+          <div class="d-flex gap-1">
+            <button name="action" value="approve" class="btn btn-sm btn-success">Approve</button>
+            <button name="action" value="reject" class="btn btn-sm btn-danger">Reject</button>
+          </div>
+        </form>
+        {% else %}
+          <span class="small text-muted">{{ r.decided_by.username|default:"-" }}<br>{{ r.remark }}</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="text-center text-muted">Koi request nahi mili.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -6,6 +6,7 @@ from django.db import transaction
 from rooms.forms import BootstrapMixin
 from rooms.models import Bed
 from .models import Tenant
+from .models import Tenant, RoomChangeRequest
 
 User = get_user_model()
 
@@ -67,3 +68,28 @@ class AllotmentForm(BootstrapMixin, forms.Form):
         self.fields["tenant"].queryset = Tenant.objects.exclude(allotments__is_active=True)
         # sirf khali beds
         self.fields["bed"].queryset = Bed.objects.filter(is_occupied=False).select_related("room__hostel")
+        
+class RoomChangeForm(BootstrapMixin, forms.ModelForm):
+    class Meta:
+        model = RoomChangeRequest
+        fields = ["requested_bed", "reason"]
+        widgets = {"reason": forms.Textarea(attrs={"rows": 3})}
+
+    def __init__(self, *args, tenant=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tenant = tenant
+        field = self.fields["requested_bed"]
+        field.queryset = Bed.objects.filter(is_occupied=False).select_related("room__hostel")
+        field.label = "Kaunsa bed chahiye"
+        field.label_from_instance = lambda b: (
+            f"{b.room.hostel.name} / Room {b.room.room_no} / {b.bed_no} "
+            f"(Rs. {b.room.rent_per_bed}/mahina)"
+        )
+
+    def clean(self):
+        data = super().clean()
+        if self.tenant and RoomChangeRequest.objects.filter(
+            tenant=self.tenant, status=RoomChangeRequest.Status.PENDING
+        ).exists():
+            raise forms.ValidationError("Aapki ek request pehle se pending hai.")
+        return data

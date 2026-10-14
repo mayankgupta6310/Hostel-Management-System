@@ -8,8 +8,13 @@ from django.views.generic import ListView, FormView
 
 from accounts.mixins import RoleRequiredMixin
 from rooms.models import Bed
-from .forms import TenantRegisterForm, AllotmentForm
-from .models import Tenant, Allotment
+from accounts.emails import notify_user
+from .forms import TenantRegisterForm, AllotmentForm, RoomChangeForm
+from .models import Tenant, Allotment, RoomChangeRequest
+
+from django.views.generic import ListView, FormView, CreateView
+
+
 
 
 class StaffMixin(RoleRequiredMixin):
@@ -86,3 +91,117 @@ class CheckoutView(StaffMixin, View):
 
         messages.success(request, f"{allotment.tenant} ka checkout ho gaya, bed free hai.")
         return redirect("tenant_list")
+
+# ---------- Tenant ----------
+class MyChangeRequestsView(RoleRequiredMixin, ListView):
+    allowed_roles = ["TENANT"]
+    template_name = "tenants/my_changes.html"
+    context_object_name = "requests"
+
+    def get_queryset(self):
+        return RoomChangeRequest.objects.filter(
+            tenant__user=self.request.user
+        ).select_related("current_bed__room", "requested_bed__room")
+
+
+class ChangeRequestCreateView(RoleRequiredMixin, CreateView):
+    allowed_roles = ["TENANT"]
+    form_class = RoomChangeForm
+    template_name = "tenants/change_form.html"
+    success_url = reverse_lazy("my_changes")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["tenant"] = getattr(self.request.user, "tenant_profile", None)
+        return kwargs
+
+    def form_valid(self, form):
+        tenant = getattr(self.request.user, "tenant_profile", None)
+        allotment = tenant.current_allotment if tenant else None
+        if allotment is None:
+            messages.error(self.request, "Aapko abhi bed allot nahi hua hai.")
+            return redirect("dashboard")
+        if form.cleaned_data["requested_bed"].pk == allotment.bed_id:
+            form.add_error("requested_bed", "Yeh aapka abhi ka hi bed hai.")
+            return self.form_invalid(form)
+
+        form.instance.tenant = tenant
+        form.instance.current_bed = allotment.bed
+        messages.success(self.request, "Room change request bhej di gayi.")
+        return super().form_valid(form)
+
+
+# ---------- Admin / Warden ----------
+class ChangeRequestListView(StaffMixin, ListView):
+    template_name = "tenants/change_list.html"
+    context_object_name = "requests"
+
+    def get_queryset(self):
+        return RoomChangeRequest.objects.select_related(
+            "tenant__user", "current_bed__room__hostel",
+            "requested_bed__room__hostel", "decided_by",
+        )
+
+
+class ChangeDecisionView(StaffMixin, View):
+    def post(self, request, pk):
+        action = request.POST.get("action")
+        remark = request.POST.get("remark", "")[:250]
+        if action not in ("approve", "reject"):
+            messages.error(request, "Galat action.")
+            return redirect("change_list")
+
+        with transaction.atomic():
+            req = get_object_or_404(RoomChangeRequest.objects.select_for_update(), pk=pk)
+            if req.status != RoomChangeRequest.Status.PENDING:
+                messages.warning(request, "Is request par pehle hi decision ho chuka hai.")
+                return redirect("change_list")
+
+            if action == "reject":
+                req.status = RoomChangeRequest.Status.REJECTED
+                req.remark = remark
+            else:
+                new_bed = Bed.objects.select_for_update().get(pk=req.requested_bed_id)
+                allot = Allotment.objects.select_for_update().filter(
+                    tenant=req.tenant, is_active=True
+                ).first()
+
+                if allot is None:
+                    req.status = RoomChangeRequest.Status.REJECTED
+                    req.remark = "Tenant ka active allotment nahi hai."
+                elif new_bed.is_occupied:
+                    req.status = RoomChangeRequest.Status.REJECTED
+                    req.remark = "Yeh bed ab khali nahi hai."
+                else:
+                    old_bed = Bed.objects.select_for_update().get(pk=allot.bed_id)
+                    today = timezone.localdate()
+
+                    allot.is_active = False
+                    allot.end_date = today
+                    allot.save()
+                    old_bed.is_occupied = False
+                    old_bed.save(update_fields=["is_occupied"])
+
+                    Allotment.objects.create(tenant=req.tenant, bed=new_bed, start_date=today)
+                    new_bed.is_occupied = True
+                    new_bed.save(update_fields=["is_occupied"])
+
+                    req.status = RoomChangeRequest.Status.APPROVED
+                    req.remark = remark
+
+            req.decided_by = request.user
+            req.decided_at = timezone.now()
+            req.save()
+
+        notify_user(
+            req.tenant.user,
+            f"Room change request {req.get_status_display()}",
+            f"Aapki room change request {req.get_status_display()} hui.\n"
+            f"Naya bed: {req.requested_bed}\n"
+            f"Remark: {req.remark or '-'}\n\nHostel Management",
+        )
+        if req.status == RoomChangeRequest.Status.APPROVED:
+            messages.success(request, f"{req.tenant} ko {req.requested_bed} mein shift kar diya.")
+        else:
+            messages.warning(request, f"Request Rejected. {req.remark}")
+        return redirect("change_list")
