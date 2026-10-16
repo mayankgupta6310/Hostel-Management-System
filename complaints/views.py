@@ -12,6 +12,8 @@ from .models import Complaint
 
 from accounts.emails import notify_user
 
+from .ml import predict_category
+
 User = get_user_model()
 
 
@@ -38,10 +40,19 @@ class ComplaintCreateView(RoleRequiredMixin, CreateView):
     def form_valid(self, form):
         tenant = getattr(self.request.user, "tenant_profile", None)
         if tenant is None:
-            messages.error(self.request, "Aapki tenant profile nahi bani hai. Warden se register karwao.")
+            messages.error(self.request, "Your tenant profile is not created. Please contact the warden.")
             return redirect("dashboard")
+
+        # AI: if the tenant left the category as "Other", try to detect it
+        text = f"{form.cleaned_data['title']} {form.cleaned_data['description']}"
+        category, confidence = predict_category(text)
+        if category and confidence >= 0.5 and form.cleaned_data["category"] == Complaint.Category.OTHER:
+            form.instance.category = category
+            label = dict(Complaint.Category.choices).get(category, category)
+            messages.info(self.request, f"AI detected category: {label} ({confidence:.0%} confident)")
+
         form.instance.tenant = tenant
-        messages.success(self.request, "Complaint darj ho gayi.")
+        messages.success(self.request, "Complaint submitted successfully.")
         return super().form_valid(form)
 
 

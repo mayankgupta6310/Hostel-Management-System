@@ -165,3 +165,12 @@ body::after {
   body, body::before, body::after { animation: none; }
   .card:hover, .btn:hover { transform: none; }
 }
+
+/* ---------- Dashboard ---------- */
+.stat-card { border-radius: 16px; }
+.stat-value { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
+
+.dash-card { padding: 1.4rem 1rem; min-height: 190px; }
+.dash-card .icon { width: 64px; height: 64px; font-size: 1.9rem; border-radius: 18px; margin-bottom: .7rem; }
+.dash-card h5 { font-weight: 700; color: var(--accent); margin-bottom: .3rem; transform: translateZ(30px); }
+.dash-card p { font-size: .85rem; margin: 0; }
