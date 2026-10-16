@@ -34,7 +34,7 @@ class Command(BaseCommand):
             self.make_tenants(password)
             Notice.objects.get_or_create(
                 title="Welcome",
-                defaults={"body": "Hostel Management demo mein aapka swagat hai.", "is_important": True},
+                defaults={"body": "Welcome to the Hostel Management demo.", "is_important": True},
             )
         self.stdout.write(self.style.SUCCESS("Demo data ready."))
 
@@ -77,7 +77,7 @@ class Command(BaseCommand):
             user = self.make_user(username, "TENANT", password, first_name=first, last_name="Demo")
             tenant, created = Tenant.objects.get_or_create(
                 user=user,
-                defaults={"guardian_name": f"{first} ke Papa", "guardian_phone": "9999999999"},
+                defaults={"guardian_name": f"{first}'s Father", "guardian_phone": "9999999999"},
             )
             if created:
                 tenant.id_proof.save("demo_id.png", ContentFile(TINY_PNG), save=True)

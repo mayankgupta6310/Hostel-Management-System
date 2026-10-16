@@ -4,13 +4,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2>My Gate Passes</h2>
-  <a href="{% url 'pass_add' %}" class="btn btn-primary">+ Nayi Request</a>
+  <a href="{% url 'pass_add' %}" class="btn btn-primary">+ New Request</a>
 </div>
 
 <div class="table-responsive">
 <table class="table table-bordered table-striped bg-white align-middle">
   <thead class="table-dark">
-    <tr><th>#</th><th>Reason</th><th>Nikalna</th><th>Wapas (expected)</th><th>Status</th><th>Actual Return</th><th>QR</th></tr>
+    <tr><th>#</th><th>Reason</th><th>Leaving</th><th>Expected return</th><th>Status</th><th>Actual Return</th><th>QR</th></tr>
   </thead>
   <tbody>
   {% for p in passes %}
@@ -33,7 +33,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Abhi koi gate pass nahi hai.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No gate passes yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

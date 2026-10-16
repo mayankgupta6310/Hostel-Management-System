@@ -4,10 +4,10 @@ from django.db import models
 
 class Complaint(models.Model):
     class Category(models.TextChoices):
-        ELECTRICAL = "ELECTRICAL", "Electrical (bijli)"
-        PLUMBING = "PLUMBING", "Plumbing (paani)"
+        ELECTRICAL = "ELECTRICAL", "Electrical"
+        PLUMBING = "PLUMBING", "Plumbing"
         FURNITURE = "FURNITURE", "Furniture"
-        CLEANING = "CLEANING", "Cleaning / Safai"
+        CLEANING = "CLEANING", "Cleaning"
         INTERNET = "INTERNET", "Wi-Fi / Internet"
         OTHER = "OTHER", "Other"
 

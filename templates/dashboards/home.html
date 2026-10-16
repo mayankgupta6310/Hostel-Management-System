@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="mb-4">
-  <h2 class="hero-title" style="font-size:2rem">Namaste, {{ user.get_full_name|default:user.username }} 👋</h2>
+  <h2 class="hero-title" style="font-size:2rem">Hello, {{ user.get_full_name|default:user.username }} 👋</h2>
   <p class="fs-6">{{ user.get_role_display }} Dashboard</p>
 </div>
 

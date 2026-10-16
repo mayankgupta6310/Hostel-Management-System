@@ -9,13 +9,13 @@ class GatePass(models.Model):
         PENDING = "PENDING", "Pending"
         APPROVED = "APPROVED", "Approved"
         REJECTED = "REJECTED", "Rejected"
-        OUT = "OUT", "Bahar hai"
-        RETURNED = "RETURNED", "Wapas aaya"
+        OUT = "OUT", "Out"
+        RETURNED = "RETURNED", "Returned"
 
     tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE, related_name="gate_passes")
     reason = models.CharField(max_length=200)
-    out_time = models.DateTimeField(help_text="Kab nikalna hai")
-    expected_return = models.DateTimeField(help_text="Kab tak wapas aaoge")
+    out_time = models.DateTimeField(help_text="When are you leaving")
+    expected_return = models.DateTimeField(help_text="When will you return")
     token = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     approved_by = models.ForeignKey(

@@ -64,7 +64,7 @@ class InvoiceListView(StaffMixin, ListView):
 class GenerateInvoicesView(StaffMixin, View):
     def post(self, request):
         n = generate_monthly_invoices()
-        messages.success(request, f"{n} naye invoice bane.")
+        messages.success(request, f"{n} new invoice(s) created.")
         return redirect("invoice_list")
 
 
@@ -77,7 +77,7 @@ class MarkPaidView(StaffMixin, View):
         with transaction.atomic():
             invoice = get_object_or_404(RentInvoice.objects.select_for_update(), pk=pk)
             if invoice.status == RentInvoice.Status.PAID:
-                messages.warning(request, "Yeh invoice pehle se paid hai.")
+                messages.warning(request, "This invoice is already paid.")
                 return redirect("invoice_list")
 
             Payment.objects.create(
@@ -92,12 +92,12 @@ class MarkPaidView(StaffMixin, View):
         notify_user(
             invoice.tenant.user,
             f"Payment received - {invoice.month:%B %Y}",
-            f"Rs. {invoice.amount} ka payment mil gaya ({method}).\n"
+            f"Rs. {invoice.amount} payment received ({method}).\n"
             f"Month: {invoice.month:%B %Y}\n"
-            f"Receipt portal se download karo: My Rent.\n\nHostel Management",
+            f"You can download the receipt from the portal: My Rent.\n\nHostel Management",
         )
 
-        messages.success(request, f"{invoice} paid mark ho gaya.")
+        messages.success(request, f"{invoice} marked as paid.")
         return redirect("invoice_list")
 
 
@@ -145,7 +145,7 @@ class ReceiptView(LoginRequiredMixin, View):
 
         y -= 20
         c.setFont("Helvetica-Oblique", 10)
-        c.drawString(60, y, "Yeh computer-generated receipt hai.")
+        c.drawString(60, y, "This is a computer-generated receipt.")
         c.showPage()
         c.save()
         buf.seek(0)
@@ -174,7 +174,7 @@ class DepositCreateView(StaffMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.handled_by = self.request.user
-        messages.success(self.request, "Deposit record ho gaya.")
+        messages.success(self.request, "Deposit recorded.")
         return super().form_valid(form)
 
 
@@ -201,7 +201,7 @@ class RefundView(StaffMixin, UpdateView):
         with transaction.atomic():
             dep = SecurityDeposit.objects.select_for_update().get(pk=self.object.pk)
             if dep.status != SecurityDeposit.Status.HELD:
-                messages.warning(self.request, "Yeh deposit pehle hi refund ho chuka hai.")
+                messages.warning(self.request, "This deposit has already been refunded.")
                 return redirect("deposit_list")
 
             dep.deduction = form.cleaned_data["deduction"]
@@ -215,12 +215,12 @@ class RefundView(StaffMixin, UpdateView):
         notify_user(
             dep.tenant.user,
             "Security deposit refund",
-            f"Aapka security deposit refund process ho gaya.\n"
+            f"Your security deposit refund has been processed.\n"
             f"Deposit: Rs. {dep.amount}\n"
             f"Deduction: Rs. {dep.deduction} ({dep.deduction_reason or '-'})\n"
             f"Refund: Rs. {dep.refunded_amount}\n\nHostel Management",
         )
-        messages.success(self.request, f"Rs. {dep.refunded_amount} refund mark ho gaya.")
+        messages.success(self.request, f"Rs. {dep.refunded_amount} marked as refunded.")
         return redirect("deposit_list")
 
 

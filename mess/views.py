@@ -43,14 +43,14 @@ class MenuEditView(MessManagerMixin, CreateView):
     form_class = MenuItemForm
     template_name = "mess/form.html"
     success_url = reverse_lazy("mess_menu")
-    extra_context = {"title": "Menu Set Karo", "back_url": reverse_lazy("mess_menu")}
+    extra_context = {"title": "Set Menu", "back_url": reverse_lazy("mess_menu")}
 
     def form_valid(self, form):
         d = form.cleaned_data
         MenuItem.objects.update_or_create(
             day=d["day"], meal_type=d["meal_type"], defaults={"items": d["items"]}
         )
-        messages.success(self.request, "Menu save ho gaya.")
+        messages.success(self.request, "Menu saved.")
         return redirect(self.success_url)
 
 
@@ -91,32 +91,32 @@ class ToggleMealView(RoleRequiredMixin, View):
     def post(self, request):
         tenant = getattr(request.user, "tenant_profile", None)
         if tenant is None:
-            messages.error(request, "Aapki tenant profile nahi bani hai.")
+            messages.error(request, "Your tenant profile has not been created.")
             return redirect("dashboard")
 
         try:
             date = timezone.datetime.strptime(request.POST.get("date", ""), "%Y-%m-%d").date()
         except ValueError:
-            messages.error(request, "Galat date.")
+            messages.error(request, "Invalid date.")
             return redirect("my_meals")
 
         meal = request.POST.get("meal")
         if meal not in MealType.values:
-            messages.error(request, "Galat meal.")
+            messages.error(request, "Invalid meal.")
             return redirect("my_meals")
 
         today = timezone.localdate()
         if date <= today or date > today + timedelta(days=3):
-            messages.error(request, "Sirf kal se agle 3 din tak ke meals badal sakte ho.")
+            messages.error(request, "You can only change meals from tomorrow for the next 3 days.")
             return redirect("my_meals")
 
         obj = MealOptOut.objects.filter(tenant=tenant, date=date, meal_type=meal)
         if obj.exists():
             obj.delete()                       # OFF tha, ab ON
-            messages.success(request, f"{date:%d %b} ka {meal.title()} ON ho gaya.")
+            messages.success(request, f"{date:%d %b} {meal.title()} is now ON.")
         else:
             MealOptOut.objects.create(tenant=tenant, date=date, meal_type=meal)   # ab OFF
-            messages.success(request, f"{date:%d %b} ka {meal.title()} OFF ho gaya.")
+            messages.success(request, f"{date:%d %b} {meal.title()} is now OFF.")
         return redirect("my_meals")
 
 
@@ -160,10 +160,10 @@ class FeedbackCreateView(RoleRequiredMixin, CreateView):
     def form_valid(self, form):
         tenant = getattr(self.request.user, "tenant_profile", None)
         if tenant is None:
-            messages.error(self.request, "Aapki tenant profile nahi bani hai.")
+            messages.error(self.request, "Your tenant profile has not been created.")
             return redirect("dashboard")
         form.instance.tenant = tenant
-        messages.success(self.request, "Feedback ke liye shukriya.")
+        messages.success(self.request, "Thank you for your feedback.")
         return super().form_valid(form)
 
 

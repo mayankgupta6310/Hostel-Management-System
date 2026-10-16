@@ -13,7 +13,7 @@ class Room(models.Model):
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name="rooms")
     room_no = models.CharField(max_length=10)
     floor = models.PositiveIntegerField(default=0)
-    capacity = models.PositiveSmallIntegerField(default=2, help_text="Kitne beds hain")
+    capacity = models.PositiveSmallIntegerField(default=2, help_text="Number of beds")
     rent_per_bed = models.DecimalField(max_digits=8, decimal_places=2)
 
     class Meta:

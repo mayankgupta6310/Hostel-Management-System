@@ -17,7 +17,7 @@
 <div class="table-responsive">
 <table class="table table-bordered table-striped bg-white align-middle">
   <thead class="table-dark">
-    <tr><th>#</th><th>Tenant</th><th>Reason</th><th>Nikalna</th><th>Wapas (expected)</th><th>Status</th><th>Action</th></tr>
+    <tr><th>#</th><th>Tenant</th><th>Reason</th><th>Leaving</th><th>Expected return</th><th>Status</th><th>Action</th></tr>
   </thead>
   <tbody>
   {% for p in passes %}
@@ -44,7 +44,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Koi request nahi mili.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No requests found.</td></tr>
   {% endfor %}
   </tbody>
 </table>

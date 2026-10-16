@@ -2,7 +2,7 @@
 {% block title %}My Tasks{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Mere Tasks</h2>
+<h2 class="mb-3">My Tasks</h2>
 
 <div class="table-responsive">
 <table class="table table-bordered table-striped bg-white align-middle">
@@ -16,7 +16,7 @@
       <td>{{ c.tenant.user.get_full_name|default:c.tenant.user.username }}</td>
       <td>{{ c.get_category_display }}</td>
       <td><strong>{{ c.title }}</strong><div class="small text-muted">{{ c.description }}</div></td>
-      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">Dekho</a>{% else %}-{% endif %}</td>
+      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">View</a>{% else %}-{% endif %}</td>
       <td><span class="badge {{ c.badge_class }}">{{ c.get_status_display }}</span></td>
       <td>
         {% if c.status != 'RESOLVED' %}
@@ -35,7 +35,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Abhi koi task assign nahi hai.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No tasks assigned yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

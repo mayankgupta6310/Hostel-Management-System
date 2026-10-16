@@ -20,57 +20,57 @@ ROLE_CARDS = [
 # (url_name, icon, title, description, color)
 MENUS = {
     "ADMIN": [
-        ("room_list", "🛏️", "Rooms & Beds", "Rooms banao, occupancy dekho", "primary"),
-        ("tenant_list", "🎓", "Tenants", "Register, bed allot, checkout", "success"),
-        ("invoice_list", "💰", "Rent / Invoices", "Invoice banao, payment mark karo", "warning"),
-        ("deposit_list", "🏦", "Security Deposits", "Deposit aur refund", "warning"),
-        ("complaint_list", "🛠️", "Complaints", "Staff ko assign karo", "danger"),
+        ("room_list", "🛏️", "Rooms & Beds", "Create rooms and view occupancy", "primary"),
+        ("tenant_list", "🎓", "Tenants", "Register, allot beds, check out", "success"),
+        ("invoice_list", "💰", "Rent / Invoices", "Generate invoices, mark payments", "warning"),
+        ("deposit_list", "🏦", "Security Deposits", "Deposits and refunds", "warning"),
+        ("complaint_list", "🛠️", "Complaints", "Assign to staff", "danger"),
         ("pass_list", "🚪", "Gate Passes", "Approve / reject", "secondary"),
-        ("visitor_list", "👥", "Visitor Log", "Visitor entry-exit record", "dark"),
-        ("change_list", "🔁", "Room Requests", "Room change approve karo", "secondary"),
-        ("mess_menu", "🍛", "Mess", "Menu aur meal count", "warning"),
-        ("reports", "📊", "Reports", "Charts aur Excel export", "dark"),
+        ("visitor_list", "👥", "Visitor Log", "Visitor entry and exit records", "dark"),
+        ("change_list", "🔁", "Room Requests", "Approve room changes", "secondary"),
+        ("mess_menu", "🍛", "Mess", "Menu and meal count", "warning"),
+        ("reports", "📊", "Reports", "Charts and Excel export", "dark"),
         ("notice_list", "📢", "Notices", "Announcements", "primary"),
-        ("/admin/", "⚙️", "Admin Panel", "Users aur data manage", "dark"),
+        ("/admin/", "⚙️", "Admin Panel", "Manage users and data", "dark"),
     ],
     "WARDEN": [
-        ("room_list", "🛏️", "Rooms & Beds", "Occupancy dekho", "primary"),
-        ("tenant_list", "🎓", "Tenants", "Register, bed allot, checkout", "success"),
-        ("invoice_list", "💰", "Rent / Invoices", "Invoice aur payment", "warning"),
-        ("deposit_list", "🏦", "Security Deposits", "Deposit aur refund", "warning"),
-        ("complaint_list", "🛠️", "Complaints", "Staff ko assign karo", "danger"),
+        ("room_list", "🛏️", "Rooms & Beds", "View occupancy", "primary"),
+        ("tenant_list", "🎓", "Tenants", "Register, allot beds, check out", "success"),
+        ("invoice_list", "💰", "Rent / Invoices", "Invoices and payments", "warning"),
+        ("deposit_list", "🏦", "Security Deposits", "Deposits and refunds", "warning"),
+        ("complaint_list", "🛠️", "Complaints", "Assign to staff", "danger"),
         ("pass_list", "🚪", "Gate Passes", "Approve / reject", "secondary"),
-        ("visitor_list", "👥", "Visitor Log", "Visitor record", "dark"),
-        ("change_list", "🔁", "Room Requests", "Room change approve karo", "secondary"),
-        ("mess_menu", "🍛", "Mess", "Menu dekho", "warning"),
-        ("reports", "📊", "Reports", "Charts aur Excel export", "dark"),
+        ("visitor_list", "👥", "Visitor Log", "Visitor records", "dark"),
+        ("change_list", "🔁", "Room Requests", "Approve room changes", "secondary"),
+        ("mess_menu", "🍛", "Mess", "View menu", "warning"),
+        ("reports", "📊", "Reports", "Charts and Excel export", "dark"),
         ("notice_list", "📢", "Notices", "Announcements", "primary"),
     ],
     "TENANT": [
-        ("my_invoices", "💰", "My Rent", "Invoice aur receipt PDF", "warning"),
+        ("my_invoices", "💰", "My Rent", "Invoices and receipt PDF", "warning"),
         ("my_deposit", "🏦", "My Deposit", "Security deposit status", "warning"),
-        ("my_complaints", "🛠️", "My Complaints", "Complaint daalo aur track karo", "danger"),
-        ("my_passes", "🚪", "Gate Pass", "Request aur QR code", "secondary"),
-        ("my_changes", "🔁", "Room Change", "Dusre bed ki request", "primary"),
+        ("my_complaints", "🛠️", "My Complaints", "Submit and track complaints", "danger"),
+        ("my_passes", "🚪", "Gate Pass", "Request and QR code", "secondary"),
+        ("my_changes", "🔁", "Room Change", "Request a different bed", "primary"),
         ("mess_menu", "🍛", "Mess", "Menu, meal ON/OFF, feedback", "success"),
         ("notice_list", "📢", "Notices", "Hostel announcements", "dark"),
     ],
     "STAFF": [
-        ("staff_tasks", "🔧", "Mere Tasks", "Assigned kaam aur status", "primary"),
+        ("staff_tasks", "🔧", "My Tasks", "Assigned work and status", "primary"),
         ("notice_list", "📢", "Notices", "Announcements", "dark"),
     ],
     "GUARD": [
-        ("guard_panel", "💂", "Guard Panel", "Out / In aur visitors", "primary"),
-        ("scan", "📷", "QR Scan", "Gate pass scan karo", "success"),
-        ("visitor_add", "➕", "Visitor Entry", "Naya visitor", "warning"),
-        ("visitor_list", "👥", "Visitor Log", "Poora record", "dark"),
+        ("guard_panel", "💂", "Guard Panel", "Out / In and visitors", "primary"),
+        ("scan", "📷", "QR Scan", "Scan gate passes", "success"),
+        ("visitor_add", "➕", "Visitor Entry", "New visitor", "warning"),
+        ("visitor_list", "👥", "Visitor Log", "Full record", "dark"),
         ("notice_list", "📢", "Notices", "Announcements", "secondary"),
     ],
     "MESS": [
-        ("mess_menu", "🍛", "Menu", "Weekly menu dekho", "primary"),
-        ("menu_edit", "✏️", "Menu Set Karo", "Din aur meal ka menu", "warning"),
-        ("meal_count", "🔢", "Meal Count", "Kal kitne log khayenge", "success"),
-        ("feedback_list", "⭐", "Feedback", "Ratings aur comments", "danger"),
+        ("mess_menu", "🍛", "Menu", "View weekly menu", "primary"),
+        ("menu_edit", "✏️", "Set Menu", "Menu by day and meal", "warning"),
+        ("meal_count", "🔢", "Meal Count", "How many will eat tomorrow", "success"),
+        ("feedback_list", "⭐", "Feedback", "Ratings and comments", "danger"),
         ("notice_list", "📢", "Notices", "Announcements", "dark"),
     ],
 }
@@ -90,21 +90,21 @@ def build_stats(user):
         occ = Bed.objects.filter(is_occupied=True).count()
         dues = RentInvoice.objects.exclude(status="PAID").aggregate(s=Sum("amount"))["s"] or 0
         return [
-            ("Beds bhare", f"{occ} / {beds}", "primary"),
+            ("Beds occupied", f"{occ} / {beds}", "primary"),
             ("Active tenants", Tenant.objects.filter(allotments__is_active=True).distinct().count(), "success"),
-            ("Rent baaki", f"₹{dues}", "danger"),
-            ("Khuli complaints", Complaint.objects.exclude(status="RESOLVED").count(), "warning"),
-            ("Pending gate pass", GatePass.objects.filter(status="PENDING").count(), "secondary"),
+            ("Rent due", f"₹{dues}", "danger"),
+            ("Open complaints", Complaint.objects.exclude(status="RESOLVED").count(), "warning"),
+            ("Pending gate passes", GatePass.objects.filter(status="PENDING").count(), "secondary"),
             ("Room requests", RoomChangeRequest.objects.filter(status="PENDING").count(), "dark"),
         ]
     if role == "TENANT":
         unpaid = RentInvoice.objects.filter(tenant__user=user).exclude(status="PAID")
         due = unpaid.aggregate(s=Sum("amount"))["s"] or 0
         return [
-            ("Rent baaki", f"₹{due}", "danger"),
+            ("Rent due", f"₹{due}", "danger"),
             ("Unpaid invoices", unpaid.count(), "warning"),
-            ("Khuli complaints", Complaint.objects.filter(tenant__user=user).exclude(status="RESOLVED").count(), "primary"),
-            ("Active gate pass", GatePass.objects.filter(tenant__user=user, status__in=["APPROVED", "OUT"]).count(), "success"),
+            ("Open complaints", Complaint.objects.filter(tenant__user=user).exclude(status="RESOLVED").count(), "primary"),
+            ("Active gate passes", GatePass.objects.filter(tenant__user=user, status__in=["APPROVED", "OUT"]).count(), "success"),
         ]
     if role == "STAFF":
         mine = Complaint.objects.filter(assigned_to=user)
@@ -114,9 +114,9 @@ def build_stats(user):
         ]
     if role == "GUARD":
         return [
-            ("Abhi bahar", GatePass.objects.filter(status="OUT").count(), "primary"),
-            ("Nikalne wale", GatePass.objects.filter(status="APPROVED").count(), "warning"),
-            ("Andar visitors", Visitor.objects.filter(out_time__isnull=True).count(), "success"),
+            ("Currently out", GatePass.objects.filter(status="OUT").count(), "primary"),
+            ("Waiting to leave", GatePass.objects.filter(status="APPROVED").count(), "warning"),
+            ("Visitors inside", Visitor.objects.filter(out_time__isnull=True).count(), "success"),
         ]
     if role == "MESS":
         return [
@@ -145,7 +145,7 @@ class RoleLoginView(LoginView):
         user = form.get_user()
         if role and user.role != role:
             label = dict(User.Role.choices)[role]
-            form.add_error(None, f"Yeh account {label} ka nahi hai. Sahi role chuno.")
+            form.add_error(None, f"This account does not belong to {label}. Please choose the correct role.")
             return self.form_invalid(form)
         return super().form_valid(form)
 

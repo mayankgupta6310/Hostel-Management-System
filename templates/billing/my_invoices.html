@@ -25,12 +25,12 @@
         {% if inv.status == 'PAID' %}
           <a href="{% url 'receipt' inv.pk %}" class="btn btn-sm btn-outline-primary">PDF</a>
         {% else %}
-          <span class="text-muted small">Warden ko pay karo</span>
+          <span class="text-muted small">Pay to the warden</span>
         {% endif %}
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="6" class="text-center text-muted">Abhi koi invoice nahi hai.</td></tr>
+    <tr><td colspan="6" class="text-center text-muted">No invoices yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -38,7 +38,7 @@ class RoomCreateView(StaffMixin, CreateView):
             response = super().form_valid(form)
             for i in range(1, self.object.capacity + 1):
                 Bed.objects.create(room=self.object, bed_no=f"B{i}")
-        messages.success(self.request, f"Room {self.object.room_no} aur {self.object.capacity} beds ban gaye.")
+        messages.success(self.request, f"Room {self.object.room_no} and {self.object.capacity} beds created.")
         return response
 
 
@@ -49,7 +49,7 @@ class RoomUpdateView(StaffMixin, UpdateView):
     success_url = reverse_lazy("room_list")
 
     def form_valid(self, form):
-        messages.success(self.request, "Room update ho gaya.")
+        messages.success(self.request, "Room updated.")
         return super().form_valid(form)
 
 
@@ -61,8 +61,8 @@ class RoomDeleteView(AdminOnlyMixin, DeleteView):
     def form_valid(self, form):
         try:
             response = super().form_valid(form)
-            messages.success(self.request, "Room delete ho gaya.")
+            messages.success(self.request, "Room deleted.")
             return response
         except ProtectedError:
-            messages.error(self.request, "Is room ke beds par tenant allotted hai, delete nahi ho sakta.")
+            messages.error(self.request, "A tenant is allotted to a bed in this room, so it cannot be deleted.")
             return redirect("room_list")

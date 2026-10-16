@@ -4,11 +4,11 @@
 {% block content %}
 <div class="card shadow-sm col-md-6 mx-auto">
   <div class="card-body">
-    <h4>Room {{ object.room_no }} delete karna hai?</h4>
-    <p class="text-muted">Iske saare beds bhi delete ho jayenge.</p>
+    <h4>Delete Room {{ object.room_no }}?</h4>
+    <p class="text-muted">All its beds will also be deleted.</p>
     <form method="post">
       {% csrf_token %}
-      <button class="btn btn-danger">Haan, delete karo</button>
+      <button class="btn btn-danger">Yes, delete</button>
       <a href="{% url 'room_list' %}" class="btn btn-secondary">Cancel</a>
     </form>
   </div>

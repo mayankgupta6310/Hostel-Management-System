@@ -7,7 +7,7 @@
 <div class="table-responsive">
 <table class="table table-bordered table-striped bg-white align-middle">
   <thead class="table-dark">
-    <tr><th>#</th><th>Tenant</th><th>Abhi ka</th><th>Chahiye</th><th>Reason</th><th>Status</th><th>Action</th></tr>
+    <tr><th>#</th><th>Tenant</th><th>Current</th><th>Requested</th><th>Reason</th><th>Status</th><th>Action</th></tr>
   </thead>
   <tbody>
   {% for r in requests %}
@@ -36,7 +36,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Koi request nahi mili.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No requests found.</td></tr>
   {% endfor %}
   </tbody>
 </table>

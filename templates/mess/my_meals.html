@@ -4,13 +4,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2>Meal ON / OFF</h2>
-  <a href="{% url 'mess_menu' %}" class="btn btn-outline-dark">Menu dekho</a>
+  <a href="{% url 'mess_menu' %}" class="btn btn-outline-dark">View menu</a>
 </div>
 
 {% if not has_profile %}
-  <div class="alert alert-warning">Aapki tenant profile nahi bani hai. Warden se register karwao.</div>
+  <div class="alert alert-warning">Your tenant profile has not been created. Please ask the warden to register you.</div>
 {% else %}
-<p class="text-muted">Default mein saare meals ON hote hain. Jo meal nahi khana, use OFF karo. Aaj ka meal change nahi ho sakta, kal se agle 3 din tak badal sakte ho.</p>
+<p class="text-muted">All meals are ON by default. Turn OFF any meal you will not eat. Today's meal cannot be changed; you can change meals from tomorrow for the next 3 days.</p>
 
 <div class="row">
 {% for day in days %}

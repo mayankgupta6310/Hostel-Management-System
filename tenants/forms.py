@@ -31,7 +31,7 @@ class TenantRegisterForm(BootstrapMixin, forms.ModelForm):
     def clean_username(self):
         username = self.cleaned_data["username"]
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError("Yeh username pehle se hai.")
+            raise forms.ValidationError("This username already exists.")
         return username
 
     def clean_password(self):
@@ -80,10 +80,10 @@ class RoomChangeForm(BootstrapMixin, forms.ModelForm):
         self.tenant = tenant
         field = self.fields["requested_bed"]
         field.queryset = Bed.objects.filter(is_occupied=False).select_related("room__hostel")
-        field.label = "Kaunsa bed chahiye"
+        field.label = "Which bed do you want"
         field.label_from_instance = lambda b: (
             f"{b.room.hostel.name} / Room {b.room.room_no} / {b.bed_no} "
-            f"(Rs. {b.room.rent_per_bed}/mahina)"
+            f"(Rs. {b.room.rent_per_bed}/month)"
         )
 
     def clean(self):
@@ -91,5 +91,5 @@ class RoomChangeForm(BootstrapMixin, forms.ModelForm):
         if self.tenant and RoomChangeRequest.objects.filter(
             tenant=self.tenant, status=RoomChangeRequest.Status.PENDING
         ).exists():
-            raise forms.ValidationError("Aapki ek request pehle se pending hai.")
+            raise forms.ValidationError("You already have a pending request.")
         return data

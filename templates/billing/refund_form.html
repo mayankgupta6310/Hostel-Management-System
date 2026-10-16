@@ -13,7 +13,7 @@
           <span class="{% if dues %}text-danger{% else %}text-success{% endif %}">₹{{ dues }}</span>
         </p>
         {% if dues %}
-          <div class="alert alert-warning small">Is tenant ka rent baaki hai. Chaho to wo amount deduction mein daal sakte ho.</div>
+          <div class="alert alert-warning small">This tenant has unpaid rent. You may include that amount in the deduction.</div>
         {% endif %}
 
         <form method="post">
@@ -26,7 +26,7 @@
               {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
             </div>
           {% endfor %}
-          <button class="btn btn-success">Refund karo</button>
+          <button class="btn btn-success">Process refund</button>
           <a href="{% url 'deposit_list' %}" class="btn btn-secondary">Cancel</a>
         </form>
       </div>

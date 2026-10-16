@@ -25,7 +25,7 @@ class NoticeCreateView(RoleRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        messages.success(self.request, "Notice post ho gaya.")
+        messages.success(self.request, "Notice posted.")
         return super().form_valid(form)
 
 
@@ -34,5 +34,5 @@ class NoticeDeleteView(RoleRequiredMixin, View):
 
     def post(self, request, pk):
         get_object_or_404(Notice, pk=pk).delete()
-        messages.success(request, "Notice delete ho gaya.")
+        messages.success(request, "Notice deleted.")
         return redirect("notice_list")

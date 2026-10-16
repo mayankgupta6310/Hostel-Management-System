@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Naya Notice{% endblock %}
+{% block title %}New Notice{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-7">
     <div class="card shadow-sm">
       <div class="card-body">
-        <h3 class="mb-3">Naya Notice</h3>
+        <h3 class="mb-3">New Notice</h3>
         <form method="post">
           {% csrf_token %}
           {{ form.non_field_errors }}
@@ -22,9 +22,9 @@
           </div>
           <div class="form-check mb-3">
             {{ form.is_important }}
-            <label class="form-check-label">Important (upar dikhega, laal border)</label>
+            <label class="form-check-label">Important (shown at the top with a red border)</label>
           </div>
-          <button class="btn btn-primary">Post karo</button>
+          <button class="btn btn-primary">Post</button>
           <a href="{% url 'notice_list' %}" class="btn btn-secondary">Cancel</a>
         </form>
       </div>

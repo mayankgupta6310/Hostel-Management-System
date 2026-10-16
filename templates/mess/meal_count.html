@@ -8,7 +8,7 @@
   <a href="{% url 'export_meals' %}" class="btn btn-success">⬇ Excel</a>
 </div>
 
-<div class="alert alert-info">Hostel mein abhi total tenants: <strong>{{ total }}</strong></div>
+<div class="alert alert-info">Total tenants in the hostel right now: <strong>{{ total }}</strong></div>
 
 <div class="table-responsive">
 <table class="table table-bordered bg-white align-middle text-center">
@@ -23,8 +23,8 @@
       <td class="fw-bold">{{ day.date|date:"D, d M" }}</td>
       {% for m in day.meals %}
         <td>
-          <span class="fs-5 fw-bold">{{ m.count }}</span> log
-          <div class="small text-muted">{{ m.off }} ne OFF kiya</div>
+          <span class="fs-5 fw-bold">{{ m.count }}</span> people
+          <div class="small text-muted">{{ m.off }} turned OFF</div>
         </td>
       {% endfor %}
     </tr>

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2>My Complaints</h2>
-  <a href="{% url 'complaint_add' %}" class="btn btn-primary">+ Nayi Complaint</a>
+  <a href="{% url 'complaint_add' %}" class="btn btn-primary">+ New Complaint</a>
 </div>
 
 <div class="table-responsive">
@@ -18,14 +18,14 @@
       <td>{{ c.pk }}</td>
       <td>{{ c.get_category_display }}</td>
       <td>{{ c.title }}<div class="small text-muted">{{ c.description|truncatechars:60 }}</div></td>
-      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">Dekho</a>{% else %}-{% endif %}</td>
+      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">View</a>{% else %}-{% endif %}</td>
       <td><span class="badge {{ c.badge_class }}">{{ c.get_status_display }}</span></td>
       <td>{{ c.assigned_to.username|default:"-" }}</td>
       <td>{{ c.staff_remark|default:"-" }}</td>
       <td>{{ c.created_at|date:"d M Y" }}</td>
     </tr>
   {% empty %}
-    <tr><td colspan="8" class="text-center text-muted">Abhi koi complaint nahi hai.</td></tr>
+    <tr><td colspan="8" class="text-center text-muted">No complaints yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

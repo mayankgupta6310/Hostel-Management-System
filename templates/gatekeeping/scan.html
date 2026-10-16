@@ -10,16 +10,16 @@
 <div class="row">
   <div class="col-md-6 mb-3">
     <div class="card shadow-sm"><div class="card-body">
-      <h6>Camera se scan</h6>
+      <h6>Scan with camera</h6>
       <div id="reader" style="width:100%"></div>
     </div></div>
   </div>
   <div class="col-md-6 mb-3">
     <div class="card shadow-sm"><div class="card-body">
-      <h6>Ya token manually daalo</h6>
+      <h6>Or enter the token manually</h6>
       <form method="post" id="scanForm">
         {% csrf_token %}
-        <input type="text" name="token" id="tokenInput" class="form-control mb-2" placeholder="Token paste karo" autofocus>
+        <input type="text" name="token" id="tokenInput" class="form-control mb-2" placeholder="Paste token" autofocus>
         <button class="btn btn-primary">Submit</button>
       </form>
     </div></div>
@@ -41,7 +41,7 @@
     }
   ).catch(() => {
     document.getElementById('reader').innerHTML =
-      '<div class="text-muted">Camera nahi chala. Token manually daalo.</div>';
+      '<div class="text-muted">Camera not working. Please enter the token manually.</div>';
   });
 </script>
 {% endblock %}

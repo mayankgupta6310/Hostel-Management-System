@@ -25,8 +25,8 @@ class Command(BaseCommand):
             ok = notify_user(
                 inv.tenant.user,
                 f"Rent reminder - due {inv.due_date:%d %b}",
-                f"Rs. {inv.amount} ka rent {inv.due_date:%d %b %Y} tak dena hai.\n"
-                f"Late hone par overdue mark hoga.\n\nHostel Management",
+                f"Rs. {inv.amount} rent is due by {inv.due_date:%d %b %Y}.\n"
+                f"It will be marked overdue if paid late.\n\nHostel Management",
             )
             sent += int(ok)
         self.stdout.write(self.style.SUCCESS(f"{sent} reminder bheje."))

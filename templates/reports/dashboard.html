@@ -15,12 +15,12 @@
   <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
     <div class="text-muted">Occupancy</div>
     <div class="fs-2 fw-bold">{{ occupancy_pct }}%</div>
-    <div class="small">{{ occupied }} / {{ total_beds }} beds bhare</div>
+    <div class="small">{{ occupied }} / {{ total_beds }} beds occupied</div>
   </div></div></div>
   <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
     <div class="text-muted">Active Tenants</div>
     <div class="fs-2 fw-bold">{{ total_tenants }}</div>
-    <div class="small">{{ vacant }} beds khali</div>
+    <div class="small">{{ vacant }} beds vacant</div>
   </div></div></div>
   <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
     <div class="text-muted">Rent Collected</div>
@@ -30,7 +30,7 @@
   <div class="col-md-3"><div class="card shadow-sm text-center"><div class="card-body">
     <div class="text-muted">Overdue</div>
     <div class="fs-2 fw-bold text-danger">₹{{ rent_overdue }}</div>
-    <div class="small">{{ open_complaints }} complaints khuli</div>
+    <div class="small">{{ open_complaints }} open complaints</div>
   </div></div></div>
 </div>
 
@@ -63,7 +63,7 @@
           <td>{{ inv.due_date|date:"d M Y" }}</td>
         </tr>
       {% empty %}
-        <tr><td colspan="4" class="text-center text-muted">Koi defaulter nahi.</td></tr>
+        <tr><td colspan="4" class="text-center text-muted">No defaulters.</td></tr>
       {% endfor %}
       </tbody>
     </table>

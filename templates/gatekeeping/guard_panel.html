@@ -11,9 +11,9 @@
   </div>
 </div>
 
-<h5 class="mt-4">Nikalne wale (Approved passes)</h5>
+<h5 class="mt-4">About to leave (approved passes)</h5>
 <table class="table table-bordered bg-white align-middle">
-  <thead class="table-dark"><tr><th>Tenant</th><th>Reason</th><th>Wapas (expected)</th><th>Action</th></tr></thead>
+  <thead class="table-dark"><tr><th>Tenant</th><th>Reason</th><th>Expected return</th><th>Action</th></tr></thead>
   <tbody>
   {% for p in approved_passes %}
     <tr>
@@ -22,41 +22,41 @@
       <td>{{ p.expected_return|date:"d M, h:i A" }}</td>
       <td>
         <form method="post" action="{% url 'pass_out' p.pk %}">
-          {% csrf_token %}<button class="btn btn-sm btn-primary">Bahar gaya</button>
+          {% csrf_token %}<button class="btn btn-sm btn-primary">Mark Out</button>
         </form>
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="4" class="text-muted text-center">Koi approved pass nahi.</td></tr>
+    <tr><td colspan="4" class="text-muted text-center">No approved passes.</td></tr>
   {% endfor %}
   </tbody>
 </table>
 
-<h5 class="mt-4">Abhi bahar hain</h5>
+<h5 class="mt-4">Currently out</h5>
 <table class="table table-bordered bg-white align-middle">
-  <thead class="table-dark"><tr><th>Tenant</th><th>Nikla</th><th>Wapas (expected)</th><th>Status</th><th>Action</th></tr></thead>
+  <thead class="table-dark"><tr><th>Tenant</th><th>Left at</th><th>Expected return</th><th>Status</th><th>Action</th></tr></thead>
   <tbody>
   {% for p in out_passes %}
     <tr class="{% if p.is_late %}table-danger{% endif %}">
       <td>{{ p.tenant.user.get_full_name|default:p.tenant.user.username }}</td>
       <td>{{ p.actual_out|date:"d M, h:i A" }}</td>
       <td>{{ p.expected_return|date:"d M, h:i A" }}</td>
-      <td>{% if p.is_late %}<span class="badge bg-danger">LATE</span>{% else %}<span class="badge bg-primary">Bahar hai</span>{% endif %}</td>
+      <td>{% if p.is_late %}<span class="badge bg-danger">LATE</span>{% else %}<span class="badge bg-primary">Out</span>{% endif %}</td>
       <td>
         <form method="post" action="{% url 'pass_return' p.pk %}">
-          {% csrf_token %}<button class="btn btn-sm btn-success">Wapas aaya</button>
+          {% csrf_token %}<button class="btn btn-sm btn-success">Mark Returned</button>
         </form>
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="5" class="text-muted text-center">Abhi koi bahar nahi hai.</td></tr>
+    <tr><td colspan="5" class="text-muted text-center">Nobody is out right now.</td></tr>
   {% endfor %}
   </tbody>
 </table>
 
-<h5 class="mt-4">Abhi andar visitors</h5>
+<h5 class="mt-4">Visitors currently inside</h5>
 <table class="table table-bordered bg-white align-middle">
-  <thead class="table-dark"><tr><th>Visitor</th><th>Phone</th><th>Kisse milne</th><th>Entry</th><th>Action</th></tr></thead>
+  <thead class="table-dark"><tr><th>Visitor</th><th>Phone</th><th>Meeting</th><th>Entry</th><th>Action</th></tr></thead>
   <tbody>
   {% for v in inside_visitors %}
     <tr>
@@ -71,7 +71,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="5" class="text-muted text-center">Koi visitor andar nahi hai.</td></tr>
+    <tr><td colspan="5" class="text-muted text-center">No visitors inside.</td></tr>
   {% endfor %}
   </tbody>
 </table>

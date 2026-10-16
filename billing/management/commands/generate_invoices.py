@@ -7,4 +7,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         n = generate_monthly_invoices()
-        self.stdout.write(self.style.SUCCESS(f"{n} naye invoice bane."))
+        self.stdout.write(self.style.SUCCESS(f"{n} new invoice(s) created."))

@@ -6,11 +6,11 @@
   <h2>Rent Invoices</h2>
   <form method="post" action="{% url 'generate_invoices' %}">
     {% csrf_token %}
-    <button class="btn btn-primary">Is mahine ke invoices banao</button>
+    <button class="btn btn-primary">Generate this month's invoices</button>
   </form>
 </div>
 
-<div class="alert alert-info">Total baaki (Pending + Overdue): <strong>₹{{ total_due }}</strong></div>
+<div class="alert alert-info">Total due (Pending + Overdue): <strong>₹{{ total_due }}</strong></div>
 
 <div class="mb-3">
   <a href="{% url 'invoice_list' %}" class="btn btn-sm {% if not current_status %}btn-dark{% else %}btn-outline-dark{% endif %}">All</a>
@@ -53,7 +53,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Koi invoice nahi mila.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No invoices found.</td></tr>
   {% endfor %}
   </tbody>
 </table>

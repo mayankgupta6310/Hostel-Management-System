@@ -25,7 +25,7 @@ class GatePassForm(BootstrapMixin, forms.ModelForm):
         data = super().clean()
         out, back = data.get("out_time"), data.get("expected_return")
         if out and back and back <= out:
-            raise forms.ValidationError("Wapas aane ka time nikalne ke time se baad ka hona chahiye.")
+            raise forms.ValidationError("Return time must be after the departure time.")
         return data
 
 

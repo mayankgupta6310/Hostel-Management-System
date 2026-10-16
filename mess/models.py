@@ -15,7 +15,7 @@ class MenuItem(models.Model):
 
     day = models.PositiveSmallIntegerField(choices=DAYS)
     meal_type = models.CharField(max_length=10, choices=MealType.choices)
-    items = models.CharField(max_length=250, help_text="Jaise: Roti, Dal, Aloo Gobhi, Chawal")
+    items = models.CharField(max_length=250, help_text="For example: Roti, Dal, Mixed Veg, Rice")
 
     class Meta:
         unique_together = ("day", "meal_type")

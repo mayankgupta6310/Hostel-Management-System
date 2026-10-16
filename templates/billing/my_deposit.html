@@ -15,14 +15,14 @@
     {% if deposit.status == 'REFUNDED' %}
       <hr>
       <p class="mb-1"><strong>Deduction:</strong> ₹{{ deposit.deduction }} {% if deposit.deduction_reason %}({{ deposit.deduction_reason }}){% endif %}</p>
-      <p class="mb-1"><strong>Refund mila:</strong> ₹{{ deposit.refunded_amount }}</p>
+      <p class="mb-1"><strong>Refund received:</strong> ₹{{ deposit.refunded_amount }}</p>
       <p class="mb-0 text-muted small">{{ deposit.refunded_on|date:"d M Y" }}</p>
     {% else %}
-      <p class="text-muted small mb-0 mt-2">Checkout ke baad damage kaat ke refund hoga.</p>
+      <p class="text-muted small mb-0 mt-2">The refund will be processed after checkout, minus any damage deductions.</p>
     {% endif %}
   </div>
 </div>
 {% else %}
-  <div class="alert alert-info">Aapka deposit abhi record nahi hua hai.</div>
+  <div class="alert alert-info">Your deposit has not been recorded yet.</div>
 {% endif %}
 {% endblock %}

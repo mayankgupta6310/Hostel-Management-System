@@ -7,10 +7,10 @@
   <div>
     {% if user.role == "TENANT" %}
       <a href="{% url 'my_meals' %}" class="btn btn-success">Meal ON / OFF</a>
-      <a href="{% url 'feedback_add' %}" class="btn btn-outline-primary">Feedback do</a>
+      <a href="{% url 'feedback_add' %}" class="btn btn-outline-primary">Give Feedback</a>
     {% endif %}
     {% if user.role == "MESS" or user.role == "ADMIN" %}
-      <a href="{% url 'menu_edit' %}" class="btn btn-primary">Menu set karo</a>
+      <a href="{% url 'menu_edit' %}" class="btn btn-primary">Set Menu</a>
       <a href="{% url 'meal_count' %}" class="btn btn-success">Meal Count</a>
       <a href="{% url 'feedback_list' %}" class="btn btn-outline-dark">Feedback</a>
     {% endif %}
@@ -23,7 +23,7 @@
   <tbody>
   {% for r in rows %}
     <tr class="{% if r.is_today %}table-warning{% endif %}">
-      <td><strong>{{ r.day }}</strong>{% if r.is_today %} <span class="badge bg-dark">Aaj</span>{% endif %}</td>
+      <td><strong>{{ r.day }}</strong>{% if r.is_today %} <span class="badge bg-dark">Today</span>{% endif %}</td>
       <td>{{ r.breakfast }}</td>
       <td>{{ r.lunch }}</td>
       <td>{{ r.dinner }}</td>

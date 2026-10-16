@@ -9,7 +9,7 @@ class RentInvoice(models.Model):
         OVERDUE = "OVERDUE", "Overdue"
 
     tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE, related_name="invoices")
-    month = models.DateField(help_text="Mahine ki 1 tarikh")
+    month = models.DateField(help_text="First day of the month")
     description = models.CharField(max_length=100, blank=True)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     due_date = models.DateField()

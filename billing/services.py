@@ -37,10 +37,10 @@ def generate_monthly_invoices(today=None):
             notify_user(
                 a.tenant.user,
                 f"Rent invoice - {month:%B %Y}",
-                f"Namaste {a.tenant.user.get_full_name() or a.tenant.user.username},\n\n"
-                f"{month:%B %Y} ka rent invoice ban gaya hai.\n"
+                f"Hello {a.tenant.user.get_full_name() or a.tenant.user.username},\n\n"
+                f"{month:%B %Y} rent invoice has been generated.\n"
                 f"Amount: Rs. {invoice.amount}\n"
-                f"Last date: {invoice.due_date:%d %b %Y}\n\n"
+                f"Due date: {invoice.due_date:%d %b %Y}\n\n"
                 f"Hostel Management",
             )
 

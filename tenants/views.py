@@ -40,7 +40,7 @@ class TenantCreateView(StaffMixin, FormView):
 
     def form_valid(self, form):
         tenant = form.save()
-        messages.success(self.request, f"Tenant {tenant} register ho gaya.")
+        messages.success(self.request, f"Tenant {tenant} registered successfully.")
         return super().form_valid(form)
 
 
@@ -48,7 +48,7 @@ class AllotBedView(StaffMixin, FormView):
     form_class = AllotmentForm
     template_name = "tenants/form.html"
     success_url = reverse_lazy("tenant_list")
-    extra_context = {"title": "Bed Allot Karo"}
+    extra_context = {"title": "Allot Bed"}
 
     def form_valid(self, form):
         tenant = form.cleaned_data["tenant"]
@@ -60,18 +60,18 @@ class AllotBedView(StaffMixin, FormView):
             bed = Bed.objects.select_for_update().get(pk=bed_id)
 
             if bed.is_occupied:
-                form.add_error("bed", "Yeh bed abhi kisi aur ko mil chuka hai.")
+                form.add_error("bed", "This bed has just been allotted to someone else.")
                 return self.form_invalid(form)
 
             if Allotment.objects.filter(tenant=tenant, is_active=True).exists():
-                form.add_error("tenant", "Is tenant ko pehle se bed allotted hai.")
+                form.add_error("tenant", "This tenant already has a bed.")
                 return self.form_invalid(form)
 
             Allotment.objects.create(tenant=tenant, bed=bed, start_date=start)
             bed.is_occupied = True
             bed.save(update_fields=["is_occupied"])
 
-        messages.success(self.request, f"{tenant} ko {bed} allot ho gaya.")
+        messages.success(self.request, f"{tenant} has been allotted {bed}.")
         return super().form_valid(form)
 
 
@@ -89,7 +89,7 @@ class CheckoutView(StaffMixin, View):
             bed.is_occupied = False
             bed.save(update_fields=["is_occupied"])
 
-        messages.success(request, f"{allotment.tenant} ka checkout ho gaya, bed free hai.")
+        messages.success(request, f"{allotment.tenant} has been checked out. The bed is now free.")
         return redirect("tenant_list")
 
 # ---------- Tenant ----------
@@ -119,15 +119,15 @@ class ChangeRequestCreateView(RoleRequiredMixin, CreateView):
         tenant = getattr(self.request.user, "tenant_profile", None)
         allotment = tenant.current_allotment if tenant else None
         if allotment is None:
-            messages.error(self.request, "Aapko abhi bed allot nahi hua hai.")
+            messages.error(self.request, "You have not been allotted a bed yet.")
             return redirect("dashboard")
         if form.cleaned_data["requested_bed"].pk == allotment.bed_id:
-            form.add_error("requested_bed", "Yeh aapka abhi ka hi bed hai.")
+            form.add_error("requested_bed", "This is your current bed.")
             return self.form_invalid(form)
 
         form.instance.tenant = tenant
         form.instance.current_bed = allotment.bed
-        messages.success(self.request, "Room change request bhej di gayi.")
+        messages.success(self.request, "Room change request submitted.")
         return super().form_valid(form)
 
 
@@ -148,13 +148,13 @@ class ChangeDecisionView(StaffMixin, View):
         action = request.POST.get("action")
         remark = request.POST.get("remark", "")[:250]
         if action not in ("approve", "reject"):
-            messages.error(request, "Galat action.")
+            messages.error(request, "Invalid action.")
             return redirect("change_list")
 
         with transaction.atomic():
             req = get_object_or_404(RoomChangeRequest.objects.select_for_update(), pk=pk)
             if req.status != RoomChangeRequest.Status.PENDING:
-                messages.warning(request, "Is request par pehle hi decision ho chuka hai.")
+                messages.warning(request, "A decision has already been made on this request.")
                 return redirect("change_list")
 
             if action == "reject":
@@ -168,10 +168,10 @@ class ChangeDecisionView(StaffMixin, View):
 
                 if allot is None:
                     req.status = RoomChangeRequest.Status.REJECTED
-                    req.remark = "Tenant ka active allotment nahi hai."
+                    req.remark = "Tenant has no active allotment."
                 elif new_bed.is_occupied:
                     req.status = RoomChangeRequest.Status.REJECTED
-                    req.remark = "Yeh bed ab khali nahi hai."
+                    req.remark = "This bed is no longer vacant."
                 else:
                     old_bed = Bed.objects.select_for_update().get(pk=allot.bed_id)
                     today = timezone.localdate()
@@ -196,12 +196,12 @@ class ChangeDecisionView(StaffMixin, View):
         notify_user(
             req.tenant.user,
             f"Room change request {req.get_status_display()}",
-            f"Aapki room change request {req.get_status_display()} hui.\n"
-            f"Naya bed: {req.requested_bed}\n"
+            f"Your room change request was {req.get_status_display()}.\n"
+            f"New bed: {req.requested_bed}\n"
             f"Remark: {req.remark or '-'}\n\nHostel Management",
         )
         if req.status == RoomChangeRequest.Status.APPROVED:
-            messages.success(request, f"{req.tenant} ko {req.requested_bed} mein shift kar diya.")
+            messages.success(request, f"{req.tenant} has been moved to {req.requested_bed}.")
         else:
             messages.warning(request, f"Request Rejected. {req.remark}")
         return redirect("change_list")

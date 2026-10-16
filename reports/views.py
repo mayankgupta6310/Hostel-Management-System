@@ -106,7 +106,7 @@ class TenantsExportView(RoleRequiredMixin, View):
         rows = []
         for t in tenants:
             a = t.current_allotment
-            bed = f"{a.bed.room.hostel.name} / Room {a.bed.room.room_no} / {a.bed.bed_no}" if a else "Allot nahi hua"
+            bed = f"{a.bed.room.hostel.name} / Room {a.bed.room.room_no} / {a.bed.bed_no}" if a else "Not allotted"
             rows.append([
                 _safe(t.user.get_full_name() or t.user.username),
                 _safe(t.user.username),

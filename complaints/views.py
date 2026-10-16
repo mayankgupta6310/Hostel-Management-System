@@ -84,15 +84,15 @@ class AssignComplaintView(StaffMixin, View):
         ).first()
 
         if complaint.status == Complaint.Status.RESOLVED:
-            messages.warning(request, "Resolved complaint assign nahi ho sakti.")
+            messages.warning(request, "A resolved complaint cannot be assigned.")
         elif staff is None:
-            messages.error(request, "Staff select karo.")
+            messages.error(request, "Please select a staff member.")
         else:
             complaint.assigned_to = staff
             if complaint.status == Complaint.Status.OPEN:
                 complaint.status = Complaint.Status.ASSIGNED
             complaint.save()
-            messages.success(request, f"{complaint} ko {staff.username} ko assign kar diya.")
+            messages.success(request, f"{complaint} assigned to {staff.username}.")
         return redirect("complaint_list")
 
 
@@ -117,7 +117,7 @@ class UpdateStatusView(RoleRequiredMixin, View):
         new_status = request.POST.get("status")
 
         if new_status not in (Complaint.Status.IN_PROGRESS, Complaint.Status.RESOLVED):
-            messages.error(request, "Galat status.")
+            messages.error(request, "Invalid status.")
             return redirect("staff_tasks")
 
         complaint.status = new_status
@@ -127,9 +127,9 @@ class UpdateStatusView(RoleRequiredMixin, View):
         if new_status == Complaint.Status.RESOLVED:
             notify_user(
                 complaint.tenant.user,
-                f"Complaint #{complaint.pk} resolve ho gayi",
-                f"Aapki complaint \"{complaint.title}\" resolve ho gayi hai.\n"
+                f"Complaint #{complaint.pk} has been resolved",
+                f"Your complaint \"{complaint.title}\" has been resolved.\n"
                 f"Staff remark: {complaint.staff_remark or '-'}\n\nHostel Management",
             )
-        messages.success(request, f"{complaint} update ho gayi.")
+        messages.success(request, f"{complaint} updated.")
         return redirect("staff_tasks")

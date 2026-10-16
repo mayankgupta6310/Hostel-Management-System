@@ -17,11 +17,11 @@
       <td>{{ v.purpose|default:"-" }}</td>
       <td>{{ v.tenant.user.get_full_name|default:v.tenant.user.username }}</td>
       <td>{{ v.in_time|date:"d M, h:i A" }}</td>
-      <td>{% if v.out_time %}{{ v.out_time|date:"d M, h:i A" }}{% else %}<span class="badge bg-warning text-dark">Andar</span>{% endif %}</td>
+      <td>{% if v.out_time %}{{ v.out_time|date:"d M, h:i A" }}{% else %}<span class="badge bg-warning text-dark">Inside</span>{% endif %}</td>
       <td>{{ v.logged_by.username|default:"-" }}</td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Abhi koi visitor entry nahi hai.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No visitor entries yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

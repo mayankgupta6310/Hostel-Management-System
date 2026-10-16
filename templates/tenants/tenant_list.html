@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2>Tenants</h2>
   <div>
-    <a href="{% url 'allot_bed' %}" class="btn btn-success">Bed Allot Karo</a>
+    <a href="{% url 'allot_bed' %}" class="btn btn-success">Allot Bed</a>
     <a href="{% url 'tenant_add' %}" class="btn btn-primary">+ Register Tenant</a>
   </div>
 </div>
@@ -25,13 +25,13 @@
       <td>{{ t.user.username }}</td>
       <td>{{ t.user.phone }}</td>
       <td>{{ t.guardian_name }} ({{ t.guardian_phone }})</td>
-      <td><a href="{{ t.id_proof.url }}" target="_blank">Dekho</a></td>
+      <td><a href="{{ t.id_proof.url }}" target="_blank">View</a></td>
       <td>
         {% with a=t.current_allotment %}
           {% if a %}
             {{ a.bed.room.hostel.name }} / Room {{ a.bed.room.room_no }} / {{ a.bed.bed_no }}
           {% else %}
-            <span class="text-muted">Allot nahi hua</span>
+            <span class="text-muted">Not allotted</span>
           {% endif %}
         {% endwith %}
       </td>
@@ -39,7 +39,7 @@
         {% with a=t.current_allotment %}
           {% if a %}
           <form method="post" action="{% url 'checkout' a.pk %}"
-                onsubmit="return confirm('Checkout karna hai?')">
+                onsubmit="return confirm('Do you want to check out?')">
             {% csrf_token %}
             <button class="btn btn-sm btn-danger">Checkout</button>
           </form>
@@ -48,7 +48,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Abhi koi tenant nahi hai.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No tenants yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

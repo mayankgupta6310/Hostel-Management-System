@@ -23,14 +23,14 @@
       <td>{{ c.tenant.user.get_full_name|default:c.tenant.user.username }}</td>
       <td>{{ c.get_category_display }}</td>
       <td>{{ c.title }}<div class="small text-muted">{{ c.description|truncatechars:60 }}</div></td>
-      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">Dekho</a>{% else %}-{% endif %}</td>
+      <td>{% if c.image %}<a href="{{ c.image.url }}" target="_blank">View</a>{% else %}-{% endif %}</td>
       <td><span class="badge {{ c.badge_class }}">{{ c.get_status_display }}</span></td>
       <td>
         {% if c.status != 'RESOLVED' %}
         <form method="post" action="{% url 'complaint_assign' c.pk %}" class="d-flex gap-1">
           {% csrf_token %}
           <select name="staff_id" class="form-select form-select-sm" required>
-            <option value="">Staff chuno</option>
+            <option value="">Select staff</option>
             {% for s in staff_users %}
               <option value="{{ s.pk }}" {% if c.assigned_to_id == s.pk %}selected{% endif %}>{{ s.username }}</option>
             {% endfor %}
@@ -44,7 +44,7 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="text-center text-muted">Koi complaint nahi mili.</td></tr>
+    <tr><td colspan="7" class="text-center text-muted">No complaints found.</td></tr>
   {% endfor %}
   </tbody>
 </table>

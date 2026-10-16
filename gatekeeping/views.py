@@ -45,10 +45,10 @@ class PassCreateView(RoleRequiredMixin, CreateView):
     def form_valid(self, form):
         tenant = getattr(self.request.user, "tenant_profile", None)
         if tenant is None or tenant.current_allotment is None:
-            messages.error(self.request, "Aapko abhi bed allot nahi hua hai.")
+            messages.error(self.request, "You have not been allotted a bed yet.")
             return redirect("dashboard")
         form.instance.tenant = tenant
-        messages.success(self.request, "Gate pass request bhej di gayi.")
+        messages.success(self.request, "Gate pass request submitted.")
         return super().form_valid(form)
 
 
@@ -76,7 +76,7 @@ class PassDecisionView(StaffMixin, View):
         with transaction.atomic():
             gp = get_object_or_404(GatePass.objects.select_for_update(), pk=pk)
             if gp.status != GatePass.Status.PENDING:
-                messages.warning(request, "Is request par pehle hi decision ho chuka hai.")
+                messages.warning(request, "A decision has already been made on this request.")
                 return redirect("pass_list")
 
             action = request.POST.get("action")
@@ -85,12 +85,12 @@ class PassDecisionView(StaffMixin, View):
             elif action == "reject":
                 gp.status = GatePass.Status.REJECTED
             else:
-                messages.error(request, "Galat action.")
+                messages.error(request, "Invalid action.")
                 return redirect("pass_list")
 
             gp.approved_by = request.user
             gp.save()
-        messages.success(request, f"{gp} ab {gp.get_status_display()} hai.")
+        messages.success(request, f"{gp} is now {gp.get_status_display()}.")
         return redirect("pass_list")
 
 
@@ -132,7 +132,7 @@ class MarkOutView(GuardMixin, View):
             gp.status = GatePass.Status.OUT
             gp.actual_out = timezone.now()
             gp.save()
-        messages.success(request, f"{gp.tenant} bahar gaya.")
+        messages.success(request, f"{gp.tenant} has gone out.")
         return redirect("guard_panel")
 
 
@@ -146,9 +146,9 @@ class MarkReturnView(GuardMixin, View):
             gp.actual_return = timezone.now()
             gp.save()
         if gp.is_late:
-            messages.warning(request, f"{gp.tenant} LATE wapas aaya.")
+            messages.warning(request, f"{gp.tenant} returned LATE.")
         else:
-            messages.success(request, f"{gp.tenant} time par wapas aaya.")
+            messages.success(request, f"{gp.tenant} returned on time.")
         return redirect("guard_panel")
 
 
@@ -160,7 +160,7 @@ class VisitorCreateView(GuardMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.logged_by = self.request.user
-        messages.success(self.request, "Visitor ki entry ho gayi.")
+        messages.success(self.request, "Visitor entry recorded.")
         return super().form_valid(form)
 
 
@@ -172,7 +172,7 @@ class VisitorOutView(GuardMixin, View):
             )
             v.out_time = timezone.now()
             v.save()
-        messages.success(request, f"{v.visitor_name} ka exit mark ho gaya.")
+        messages.success(request, f"{v.visitor_name} has exited.")
         return redirect("guard_panel")
 
     
@@ -204,7 +204,7 @@ class ScanView(GuardMixin, View):
         try:
             token = uuid.UUID(raw)
         except ValueError:
-            messages.error(request, "Galat QR / token.")
+            messages.error(request, "Invalid QR / token.")
             return redirect("scan")
 
         with transaction.atomic():
@@ -215,7 +215,7 @@ class ScanView(GuardMixin, View):
                 .first()
             )
             if gp is None:
-                messages.error(request, "Yeh pass nahi mila.")
+                messages.error(request, "Pass not found.")
                 return redirect("scan")
 
             name = gp.tenant.user.get_full_name() or gp.tenant.user.username
@@ -224,17 +224,17 @@ class ScanView(GuardMixin, View):
                 gp.status = GatePass.Status.OUT
                 gp.actual_out = timezone.now()
                 gp.save()
-                messages.success(request, f"{name} BAHAR gaya.")
+                messages.success(request, f"{name} has gone OUT.")
             elif gp.status == GatePass.Status.OUT:
                 gp.status = GatePass.Status.RETURNED
                 gp.actual_return = timezone.now()
                 gp.save()
                 if gp.is_late:
-                    messages.warning(request, f"{name} LATE wapas aaya.")
+                    messages.warning(request, f"{name} returned LATE.")
                 else:
-                    messages.success(request, f"{name} time par WAPAS aaya.")
+                    messages.success(request, f"{name} has RETURNED on time.")
             elif gp.status == GatePass.Status.RETURNED:
-                messages.warning(request, "Yeh pass pehle hi use ho chuka hai.")
+                messages.warning(request, "This pass has already been used.")
             else:
-                messages.error(request, f"Pass {gp.get_status_display()} hai, scan nahi ho sakta.")
+                messages.error(request, f"Pass is {gp.get_status_display()} and cannot be scanned.")
         return redirect("scan")
