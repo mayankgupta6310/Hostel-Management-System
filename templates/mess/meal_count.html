@@ -4,8 +4,10 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2>Meal Count</h2>
-  <a href="{% url 'mess_menu' %}" class="btn btn-outline-dark">Menu</a>
-  <a href="{% url 'export_meals' %}" class="btn btn-success">⬇ Excel</a>
+  <div>
+    <a href="{% url 'export_meals' %}" class="btn btn-success">Excel</a>
+    <a href="{% url 'mess_menu' %}" class="btn btn-outline-dark">Menu</a>
+  </div>
 </div>
 
 <div class="alert alert-info">Total tenants in the hostel right now: <strong>{{ total }}</strong></div>
@@ -23,8 +25,11 @@
       <td class="fw-bold">{{ day.date|date:"D, d M" }}</td>
       {% for m in day.meals %}
         <td>
-          <span class="fs-5 fw-bold">{{ m.count }}</span> people
+          <div class="small text-muted">Up to <strong>{{ m.count }}</strong> people</div>
           <div class="small text-muted">{{ m.off }} turned OFF</div>
+          {% if m.forecast is not None %}
+            <div class="mt-1"><span class="badge bg-primary fs-6">AI: cook for {{ m.forecast }}</span></div>
+          {% endif %}
         </td>
       {% endfor %}
     </tr>
@@ -32,4 +37,5 @@
   </tbody>
 </table>
 </div>
+<p class="small text-white">AI forecast uses past eating patterns by weekday and meal, minus people who already turned the meal OFF, plus a 5% buffer.</p>
 {% endblock %}

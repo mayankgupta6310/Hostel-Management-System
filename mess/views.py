@@ -12,7 +12,7 @@ from accounts.mixins import RoleRequiredMixin
 from tenants.models import Tenant
 from .forms import FeedbackForm, MenuItemForm
 from .models import MealOptOut, MealType, MenuItem, MessFeedback
-
+from .forecast import forecast_count
 
 class MessManagerMixin(RoleRequiredMixin):
     allowed_roles = ["MESS", "ADMIN"]
@@ -130,7 +130,7 @@ class MealCountView(MessManagerMixin, TemplateView):
         total = Tenant.objects.filter(allotments__is_active=True).distinct().count()
 
         days = []
-        for offset in range(0, 3):
+        for offset in range(0, 7):
             d = today + timedelta(days=offset)
             off = dict(
                 MealOptOut.objects.filter(date=d, tenant__allotments__is_active=True)
@@ -140,7 +140,12 @@ class MealCountView(MessManagerMixin, TemplateView):
             days.append({
                 "date": d,
                 "meals": [
-                    {"label": label, "off": off.get(code, 0), "count": total - off.get(code, 0)}
+                    {
+                        "label": label,
+                        "off": off.get(code, 0),
+                        "count": total - off.get(code, 0),
+                        "forecast": forecast_count(d, code, total, off.get(code, 0)),
+                    }
                     for code, label in MealType.choices
                 ],
             })
