@@ -70,6 +70,37 @@
   </div>
 </div>
 
+<div class="card shadow-sm mt-4">
+  <div class="card-body">
+    <h6>Rent Default Risk (AI)</h6>
+    {% if not risk_available %}
+      <p class="text-muted mb-0">The risk model is not available. Train it first (ml/train_risk.py).</p>
+    {% else %}
+    <table class="table table-sm align-middle mb-1">
+      <thead><tr><th>Tenant</th><th>Invoices</th><th>Late ratio</th><th>Unpaid overdue</th><th>Risk</th><th>Chance of late payment</th></tr></thead>
+      <tbody>
+      {% for r in risk_rows %}
+        <tr>
+          <td>{{ r.tenant.user.get_full_name|default:r.tenant.user.username }}</td>
+          <td>{{ r.total }}</td>
+          <td>{% widthratio r.late_ratio 1 100 %}%</td>
+          <td>{{ r.unpaid }}</td>
+          {% if r.level %}
+            <td><span class="badge {% if r.level == 'HIGH' %}bg-danger{% elif r.level == 'MEDIUM' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ r.level|title }}</span></td>
+            <td>{% widthratio r.prob 1 100 %}%</td>
+          {% else %}
+            <td colspan="2" class="text-muted">Not enough history</td>
+          {% endif %}
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-center text-muted">No active tenants.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p class="small text-muted mb-0">Estimated from past payment behaviour. Use it to send early reminders, not to penalize tenants.</p>
+    {% endif %}
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 {{ month_labels|json_script:"month-labels" }}
 {{ month_values|json_script:"month-values" }}

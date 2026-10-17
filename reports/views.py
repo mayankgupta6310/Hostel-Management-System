@@ -15,7 +15,7 @@ from django.views import View
 
 from mess.models import MealOptOut, MealType
 from .excel import make_xlsx_response
-
+from .risk import risk_for_tenants
 
 class DashboardReportView(RoleRequiredMixin, TemplateView):
     allowed_roles = ["ADMIN", "WARDEN"]
@@ -63,6 +63,9 @@ class DashboardReportView(RoleRequiredMixin, TemplateView):
             RentInvoice.objects.filter(status="OVERDUE")
             .select_related("tenant__user").order_by("due_date")[:10]
         )
+        risk_rows, risk_available = risk_for_tenants()
+        ctx["risk_rows"] = risk_rows
+        ctx["risk_available"] = risk_available
         return ctx
 
 def _safe(text):

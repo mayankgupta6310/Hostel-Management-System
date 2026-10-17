@@ -12,8 +12,11 @@ from .models import Complaint
 
 from accounts.emails import notify_user
 
-from .ml import predict_category
 
+
+from django.db.models import Case, IntegerField, Value, When
+
+from .ml import predict_category, predict_priority
 User = get_user_model()
 
 
